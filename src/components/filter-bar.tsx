@@ -1,3 +1,4 @@
+// src/components/filter-bar.tsx
 'use client'
 
 interface FilterButton {
@@ -27,6 +28,7 @@ export function FilterBar({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search titles…"
+        aria-label="Search titles"
         className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
       />
       <div className="flex flex-wrap gap-1.5">
