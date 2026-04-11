@@ -30,4 +30,4 @@ RUN addgroup --system --gid 1001 nodejs && \
 USER nextjs
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && node_modules/.bin/tsx server.ts"]
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node_modules/.bin/tsx server.ts"]
