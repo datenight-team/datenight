@@ -10,7 +10,7 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
 - **Drag to reorder** the watchlist (dnd-kit sortable)
 - **Seerr integration** — top 10 unwatched movies are automatically requested for download; status shown per movie (Queued / Downloading / Ready)
 - **Plex integration** — a "Date Night" playlist is kept in sync with available movies in watch order
-- **Blind ratings** — Ian and Krista each submit a star rating (1–5) and a critic's quote independently; results are revealed only after both have rated
+- **Blind ratings** — each person gives a thumbs up or down and writes a critic's quote independently (Siskel & Ebert style); results are revealed only after both have rated, with 🤝 if you agreed and ⚔️ if you didn't
 - **Ask Claude** — sidebar link opens Claude with a pre-filled recommendation prompt based on recently watched films
 - **Warm amber theme** — cozy UI, not a media server dashboard
 
@@ -44,6 +44,8 @@ cp .env.example .env.local
 | `SEERR_API_KEY` | Seerr API key (Settings → API Key) |
 | `PLEX_URL` | Base URL of your Plex server, e.g. `http://plex:32400` |
 | `PLEX_TOKEN` | [Plex authentication token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) |
+| `USER1_NAME` | Display name for the first user (default: `User 1`) |
+| `USER2_NAME` | Display name for the second user (default: `User 2`) |
 
 ## Running Locally
 

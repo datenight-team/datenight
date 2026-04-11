@@ -48,10 +48,12 @@ Script is at `scripts/import-csv.ts`. Auto-detects common column names (`Title`,
 
 | Decision | Choice |
 |---|---|
-| Users | Ian + Krista — named buttons, no login |
+| Users | Configurable via `USER1_NAME`/`USER2_NAME` env vars — named buttons, no login |
 | Style | Warm amber/cream (Warm Date Night theme) |
 | Layout | Sidebar nav |
 | Movie entry | Paste IMDB or Criterion URL |
+| Rating system | Thumbs up / thumbs down + critic's quote (Siskel & Ebert style) — `rating String` in DB |
+| Reveal | 🤝 if agreed, ⚔️ if disagreed — shown after both submit |
 | Request manager | Seerr |
 | After both rate | Auto-delete from Plex |
 | Architecture | Single Next.js container, SQLite on mounted volume |
