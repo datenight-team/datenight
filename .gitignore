@@ -40,6 +40,6 @@ yarn-error.log*
 next-env.d.ts
 
 # local data
-data/*.db
+data/
 
 /src/generated/prisma

@@ -1,0 +1,76 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please fill out as much as you can — it makes diagnosing the issue much faster.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "When I paste a Criterion URL and click Add, the preview never loads and the page just spins."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How do we trigger the bug?
+      placeholder: |
+        1. Go to Add Movie
+        2. Paste this URL: ...
+        3. Click Preview
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: How are you running the app?
+      options:
+        - Docker (docker compose)
+        - Local dev (npm run dev)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version
+      description: Run `node --version`
+      placeholder: "v24.0.0"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste any relevant output from `make docker-logs` or the browser console. Redact any API keys.
+      render: shell
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment variables set
+      description: List which env vars you have configured (values redacted). This helps rule out missing config.
+      placeholder: |
+        TMDB_API_KEY=set
+        SEERR_URL=set
+        SEERR_API_KEY=set
+        PLEX_URL=not set
+        PLEX_TOKEN=not set
+        ANTHROPIC_API_KEY=not set

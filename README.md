@@ -1,6 +1,6 @@
 # Date Night
 
-A home-lab web app for Ian and Krista to manage their [Criterion Collection](https://www.criterion.com) date night movie watchlist.
+A home-lab web app for two people to manage their [Criterion Collection](https://www.criterion.com) date night movie watchlist.
 
 Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Criterion URL, drag to set the watch order, and the app automatically queues downloads via Seerr and keeps a "Date Night" Plex playlist in sync.
 
