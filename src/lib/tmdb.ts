@@ -15,7 +15,7 @@ async function fetchDetails(tmdbId: number): Promise<TmdbMovieDetails | null> {
   return {
     id: m.id,
     title: m.title,
-    year: parseInt((m.release_date ?? '0').split('-')[0], 10),
+    year: parseInt((m.release_date || '0').split('-')[0], 10) || 0,
     runtime: m.runtime ?? 0,
     description: m.overview ?? '',
     posterUrl: m.poster_path ? `${IMG_BASE}${m.poster_path}` : '',
