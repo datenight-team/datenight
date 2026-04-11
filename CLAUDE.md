@@ -16,6 +16,8 @@ A home-lab web app for Ian and Krista to manage their Criterion Collection date 
 
 Read the implementation plan and execute it task by task starting at Task 1 using the `superpowers:subagent-driven-development` skill (or `superpowers:executing-plans` for inline execution).
 
+No need for a worktree. Just work on the main branch for now.
+
 ## Tech Stack (decided, not yet built)
 
 Next.js 14 · TypeScript · Tailwind CSS · shadcn/ui · dnd-kit · Prisma + SQLite · node-cron · tsx · Vitest · Docker
