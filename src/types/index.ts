@@ -9,7 +9,7 @@ export type SeerrStatus =
   | 'available'
   | 'deleted'
 
-export type User = 'ian' | 'krista'
+export type User = 'user1' | 'user2'
 
 export interface Movie {
   id: number

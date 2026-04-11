@@ -12,12 +12,13 @@ import {
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
-import type { Movie } from '@/types'
+import type { Movie, User } from '@/types'
 
 export default function WatchlistPage() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [ratingTarget, setRatingTarget] = useState<Movie | null>(null)
+  const [userNames, setUserNames] = useState<Record<User, string>>({ user1: 'User 1', user2: 'User 2' })
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
@@ -25,7 +26,13 @@ export default function WatchlistPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchMovies() }, [fetchMovies])
+  useEffect(() => {
+    fetchMovies()
+    fetch('/api/user-names')
+      .then((r) => r.json())
+      .then(setUserNames)
+      .catch(() => {})
+  }, [fetchMovies])
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -71,7 +78,6 @@ export default function WatchlistPage() {
       </div>
 
       {loading ? (
-        // Loading skeleton
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
             <div
@@ -120,6 +126,7 @@ export default function WatchlistPage() {
         <RatingDialog
           movie={ratingTarget}
           open={true}
+          userNames={userNames}
           onClose={() => setRatingTarget(null)}
           onComplete={() => {
             setRatingTarget(null)

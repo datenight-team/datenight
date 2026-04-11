@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { StarRating } from './star-rating'
+import { otherUser, USER_KEYS } from '@/lib/users'
 import type { Movie, User, Rating } from '@/types'
 
 type Step = 'who' | 'form' | 'waiting' | 'reveal'
@@ -19,11 +20,10 @@ interface RatingDialogProps {
   open: boolean
   onClose: () => void
   onComplete: () => void
+  userNames: Record<User, string>
 }
 
-const userName: Record<User, string> = { ian: 'Ian', krista: 'Krista' }
-
-export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogProps) {
+export function RatingDialog({ movie, open, onClose, onComplete, userNames }: RatingDialogProps) {
   const [step, setStep] = useState<Step>('who')
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [stars, setStars] = useState(0)
@@ -32,7 +32,6 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Mark as watched first, then show rating UI
   const handleUserSelect = async (user: User) => {
     if (step === 'who') {
       // On first user: call /watched to trigger Seerr delete + status update
@@ -64,8 +63,7 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
         setStep('reveal')
         onComplete()
       } else {
-        const other: User = currentUser === 'ian' ? 'krista' : 'ian'
-        setCurrentUser(other)
+        setCurrentUser(otherUser(currentUser))
         setStep('waiting')
       }
     } finally {
@@ -73,9 +71,7 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
     }
   }
 
-  const otherUser: User | null = currentUser
-    ? currentUser === 'ian' ? 'krista' : 'ian'
-    : null
+  const other = currentUser ? otherUser(currentUser) : null
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -87,13 +83,13 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
         {step === 'who' && (
           <div className="space-y-3 py-2">
             <p className="text-sm text-stone-600">Who&apos;s rating this one?</p>
-            {(['ian', 'krista'] as User[]).map((user) => (
+            {USER_KEYS.map((user) => (
               <Button
                 key={user}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 onClick={() => handleUserSelect(user)}
               >
-                {userName[user]}
+                {userNames[user]}
               </Button>
             ))}
           </div>
@@ -102,7 +98,7 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
         {step === 'form' && currentUser && (
           <div className="space-y-4 py-2">
             <p className="text-sm text-stone-600">
-              {userName[currentUser]}&apos;s rating for <em>{movie.title}</em>
+              {userNames[currentUser]}&apos;s rating for <em>{movie.title}</em>
             </p>
             <div>
               <p className="text-xs text-stone-500 mb-1">Stars</p>
@@ -129,17 +125,17 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
           </div>
         )}
 
-        {step === 'waiting' && otherUser && (
+        {step === 'waiting' && other && (
           <div className="space-y-4 py-2 text-center">
             <p className="text-3xl">⏳</p>
             <p className="text-sm text-stone-600">
-              Waiting for <strong>{userName[otherUser]}</strong> to add their rating…
+              Waiting for <strong>{userNames[other]}</strong> to add their rating…
             </p>
             <Button
               className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-              onClick={() => handleUserSelect(otherUser)}
+              onClick={() => handleUserSelect(other)}
             >
-              I&apos;m {userName[otherUser]} — Rate Now
+              I&apos;m {userNames[other]} — Rate Now
             </Button>
           </div>
         )}
@@ -151,7 +147,7 @@ export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogP
             {ratings.map((r) => (
               <div key={r.user} className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold text-amber-900 text-sm">{userName[r.user as User]}</span>
+                  <span className="font-semibold text-amber-900 text-sm">{userNames[r.user as User]}</span>
                   <StarRating value={r.stars} readonly size="sm" />
                 </div>
                 <p className="text-stone-600 text-xs italic">&ldquo;{r.quote}&rdquo;</p>

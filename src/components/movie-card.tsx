@@ -3,9 +3,12 @@ import Image from 'next/image'
 import { StarRating } from './star-rating'
 import type { Movie, Rating, User } from '@/types'
 
-const userName: Record<User, string> = { ian: 'Ian', krista: 'Krista' }
+interface MovieCardProps {
+  movie: Movie
+  userNames: Record<User, string>
+}
 
-export function MovieCard({ movie }: { movie: Movie }) {
+export function MovieCard({ movie, userNames }: MovieCardProps) {
   const ratings = movie.ratings ?? []
   const bothRated = ratings.length === 2
 
@@ -30,7 +33,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
             {ratings.map((r: Rating) => (
               <div key={r.user} className="bg-amber-50 rounded-lg p-2">
                 <div className="flex justify-between items-center mb-0.5">
-                  <span className="text-xs font-semibold text-amber-900">{userName[r.user as User]}</span>
+                  <span className="text-xs font-semibold text-amber-900">{userNames[r.user as User]}</span>
                   <StarRating value={r.stars} readonly size="sm" />
                 </div>
                 <p className="text-xs text-stone-500 italic line-clamp-2">&ldquo;{r.quote}&rdquo;</p>

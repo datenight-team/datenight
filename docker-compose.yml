@@ -24,6 +24,8 @@ services:
       - SEERR_API_KEY=${SEERR_API_KEY}
       - PLEX_URL=${PLEX_URL}
       - PLEX_TOKEN=${PLEX_TOKEN}
+      - USER1_NAME=${USER1_NAME:-User 1}
+      - USER2_NAME=${USER2_NAME:-User 2}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/sync"]
