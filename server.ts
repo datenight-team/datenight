@@ -22,3 +22,7 @@ app.prepare().then(async () => {
     console.log(`> Ready on http://localhost:${port}`)
   })
 })
+  .catch((err) => {
+    console.error('Failed to start server:', err)
+    process.exit(1)
+  })

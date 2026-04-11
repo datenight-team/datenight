@@ -24,6 +24,10 @@ COPY package*.json ./
 COPY .env.example ./
 
 RUN mkdir -p /app/data
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app/data
+USER nextjs
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx server.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node_modules/.bin/tsx server.ts"]
