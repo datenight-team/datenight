@@ -2,7 +2,7 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 
-function createPrismaClient() {
+function createPrismaClient(): PrismaClient {
   const url = process.env.DATABASE_URL ?? 'file:./dev.db'
   // Strip the "file:" prefix, keep ":memory:" as-is
   const dbUrl = url.startsWith('file:') ? url.slice(5) : url
