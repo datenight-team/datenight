@@ -123,7 +123,7 @@ export default function WatchlistPage() {
             onSearchChange={setSearch}
             buttons={STATUS_BUTTONS}
             activeButton={activeStatus}
-            onButtonChange={setActiveStatus}
+            onButtonChange={(v) => setActiveStatus(v as SeerrStatus | null)}
           />
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={isFiltered ? undefined : handleDragEnd}>
