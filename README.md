@@ -72,6 +72,37 @@ docker compose up -d
 
 The container runs `prisma migrate deploy` on startup before serving traffic.
 
+## Bulk Import from a Spreadsheet
+
+If you have an existing list of films in a Google Sheet (or any spreadsheet), you can bulk-import them via CSV.
+
+### Local development
+
+```bash
+# Export your sheet: File → Download → Comma Separated Values (.csv)
+npm run import ~/Downloads/criterion.csv
+
+# If the title column isn't auto-detected, specify it
+npm run import ~/Downloads/criterion.csv "Film Title"
+```
+
+### Production (Docker)
+
+```bash
+# 1. Get the CSV onto your homelab host, then copy it into the container
+docker cp /path/to/criterion.csv datenight:/app/data/criterion.csv
+
+# 2. Run the import inside the container
+docker exec datenight node_modules/.bin/tsx scripts/import-csv.ts /app/data/criterion.csv
+
+# 3. Clean up
+docker exec datenight rm /app/data/criterion.csv
+```
+
+The script looks up each film on TMDB by title, skips anything already in the list, and prints a summary of what imported, what was skipped, and anything it couldn't find (so you can add those manually via the UI).
+
+Auto-detected column names: `Title`, `Film`, `Movie`, `Name`, `Film Title`, `Movie Title`. Any other name — pass it as the second argument.
+
 ## Tests
 
 ```bash
