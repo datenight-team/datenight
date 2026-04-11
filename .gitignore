@@ -41,5 +41,6 @@ next-env.d.ts
 
 # local data
 data/
+/*.csv
 
 /src/generated/prisma
