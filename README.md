@@ -1,8 +1,27 @@
 # Date Night
 
+[![CI](https://github.com/ianchesal/datenight/actions/workflows/ci.yml/badge.svg)](https://github.com/ianchesal/datenight/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Next.js](https://img.shields.io/github/package-json/dependency-version/ianchesal/datenight/next?label=Next.js&logo=next.js&logoColor=white&color=black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
+[![Powered by Claude](https://img.shields.io/badge/Powered%20by-Claude%20Opus-D97757?logo=anthropic&logoColor=white)](https://anthropic.com)
+
 A home-lab web app for two people to manage their [Criterion Collection](https://www.criterion.com) date night movie watchlist.
 
 Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Criterion URL, drag to set the watch order, and the app automatically queues downloads via Seerr and keeps a "Date Night" Plex playlist in sync.
+
+## Screenshots
+
+<!-- Add screenshots here! Suggested shots:
+  - The watchlist view showing movies with their download status badges
+  - The blind rating dialog (before reveal)
+  - The rating reveal (🤝 agreed / ⚔️ disagreed)
+  - The watched grid with critic quote cards
+  - The Claude recommendations page
+-->
+
+> 📸 Screenshots coming soon.
 
 ## Features
 
