@@ -1,7 +1,6 @@
+// src/app/page.tsx
+import { redirect } from 'next/navigation'
+
 export default function Home() {
-  return (
-    <main>
-      <h1>Date Night</h1>
-    </main>
-  );
+  redirect('/watchlist')
 }
