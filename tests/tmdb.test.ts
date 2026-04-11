@@ -106,8 +106,25 @@ describe('lookupCriterionSlug', () => {
     expect(result?.title).toBe('Seven Samurai')
   })
 
-  it('returns null when Criterion page fetch fails', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false })
+  it('falls back to slug-derived title search when Criterion page is blocked', async () => {
+    // Criterion page blocked (e.g. Cloudflare) → fall back to slug title → TMDB search succeeds
+    mockFetch
+      .mockResolvedValueOnce({ ok: false }) // Criterion page blocked
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ id: 345911 }] }),
+      })
+      .mockResolvedValueOnce({ ok: true, json: async () => detailsResponse })
+
+    const result = await lookupCriterionSlug('28630-seven-samurai')
+    expect(result?.title).toBe('Seven Samurai')
+  })
+
+  it('returns null when Criterion page is blocked and slug search finds nothing', async () => {
+    mockFetch
+      .mockResolvedValueOnce({ ok: false }) // Criterion page blocked
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ results: [] }) }) // slug search misses
+
     expect(await lookupCriterionSlug('28630-seven-samurai')).toBeNull()
   })
 })

@@ -23,7 +23,7 @@
  * DATABASE_URL must be set in .env.local (or the environment).
  */
 
-import 'dotenv/config'
+// env vars injected via --env-file=.env.local in the npm script
 import { readFileSync } from 'fs'
 import { parse } from 'csv-parse/sync'
 import { searchByTitle } from '../src/lib/tmdb'

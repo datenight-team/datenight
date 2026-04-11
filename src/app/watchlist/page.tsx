@@ -12,13 +12,25 @@ import {
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
-import type { Movie, User } from '@/types'
+import { FilterBar } from '@/components/filter-bar'
+import type { Movie, User, SeerrStatus } from '@/types'
+
+// 'deleted' is intentionally omitted — it's a transient Seerr state with no
+// useful filter action for the user on the watchlist.
+const STATUS_BUTTONS = [
+  { label: 'Not Requested', value: 'not_requested' },
+  { label: 'Queued', value: 'pending' },
+  { label: 'Downloading', value: 'processing' },
+  { label: 'Ready', value: 'available' },
+]
 
 export default function WatchlistPage() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [ratingTarget, setRatingTarget] = useState<Movie | null>(null)
   const [userNames, setUserNames] = useState<Record<User, string>>({ user1: 'User 1', user2: 'User 2' })
+  const [search, setSearch] = useState('')
+  const [activeStatus, setActiveStatus] = useState<SeerrStatus | null>(null)
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
@@ -36,6 +48,14 @@ export default function WatchlistPage() {
   }, [fetchMovies])
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+
+  const isFiltered = search !== '' || activeStatus !== null
+  const lowerSearch = search.toLowerCase()
+  const filteredMovies = movies.filter(
+    (m) =>
+      m.title.toLowerCase().includes(lowerSearch) &&
+      (activeStatus === null || m.seerrStatus === activeStatus)
+  )
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
@@ -98,9 +118,17 @@ export default function WatchlistPage() {
         </div>
       ) : (
         <>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={movies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
-              {movies.map((movie, index) => (
+          <FilterBar
+            search={search}
+            onSearchChange={setSearch}
+            buttons={STATUS_BUTTONS}
+            activeButton={activeStatus}
+            onButtonChange={(v) => setActiveStatus(v as SeerrStatus | null)}
+          />
+
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={isFiltered ? undefined : handleDragEnd}>
+            <SortableContext items={filteredMovies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
+              {filteredMovies.map((movie, index) => (
                 <MovieRow
                   key={movie.id}
                   movie={movie}
@@ -113,11 +141,13 @@ export default function WatchlistPage() {
             </SortableContext>
           </DndContext>
 
-          {movies.length === 0 && (
+          {filteredMovies.length === 0 && (
             <div className="text-center text-amber-600 mt-16">
               <div className="text-5xl mb-4">🎬</div>
-              <p className="font-medium">No movies yet</p>
-              <p className="text-sm text-amber-500 mt-1">Add some from the sidebar</p>
+              <p className="font-medium">{search || activeStatus ? 'No movies match your filter' : 'No movies yet'}</p>
+              <p className="text-sm text-amber-500 mt-1">
+                {search || activeStatus ? 'Try clearing the search or filter' : 'Add some from the sidebar'}
+              </p>
             </div>
           )}
         </>

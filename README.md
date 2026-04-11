@@ -13,15 +13,13 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
 
 ## Screenshots
 
-<!-- Add screenshots here! Suggested shots:
-  - The watchlist view showing movies with their download status badges
-  - The blind rating dialog (before reveal)
-  - The rating reveal (🤝 agreed / ⚔️ disagreed)
-  - The watched grid with critic quote cards
-  - The Claude recommendations page
--->
-
-> 📸 Screenshots coming soon.
+<table>
+  <tr>
+    <td align="center"><a href="datenight-watch-list.png"><img src="datenight-watch-list.png" width="260" alt="Watchlist"/></a><br/><sub>Watchlist</sub></td>
+    <td align="center"><a href="datenight-add-movie.png"><img src="datenight-add-movie.png" width="260" alt="Add Movie"/></a><br/><sub>Add Movie</sub></td>
+    <td align="center"><a href="datenight-recommendations.png"><img src="datenight-recommendations.png" width="260" alt="Recommendations"/></a><br/><sub>Recommendations</sub></td>
+  </tr>
+</table>
 
 ## Features
 
