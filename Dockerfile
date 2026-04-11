@@ -3,6 +3,8 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 FROM base AS deps
+# python3/make/g++ needed to compile better-sqlite3 native module on Alpine
+RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 RUN npm ci
 

@@ -16,11 +16,13 @@ import type { Movie } from '@/types'
 
 export default function WatchlistPage() {
   const [movies, setMovies] = useState<Movie[]>([])
+  const [loading, setLoading] = useState(true)
   const [ratingTarget, setRatingTarget] = useState<Movie | null>(null)
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
     setMovies(data)
+    setLoading(false)
   }, [])
 
   useEffect(() => { fetchMovies() }, [fetchMovies])
@@ -34,7 +36,6 @@ export default function WatchlistPage() {
     const oldIndex = movies.findIndex((m) => m.id === active.id)
     const newIndex = movies.findIndex((m) => m.id === over.id)
 
-    // Optimistic update
     setMovies(arrayMove(movies, oldIndex, newIndex))
 
     await fetch(`/api/movies/${active.id}/reorder`, {
@@ -43,7 +44,6 @@ export default function WatchlistPage() {
       body: JSON.stringify({ newIndex }),
     })
 
-    // Re-fetch authoritative order
     fetchMovies()
   }
 
@@ -52,37 +52,68 @@ export default function WatchlistPage() {
     fetchMovies()
   }
 
+  const handleRemove = async (movieId: number) => {
+    setMovies((prev) => prev.filter((m) => m.id !== movieId))
+    await fetch(`/api/movies/${movieId}`, { method: 'DELETE' })
+  }
+
   const readyCount = movies.filter((m) => m.seerrStatus === 'available').length
 
   return (
     <div className="p-6 max-w-2xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-amber-900">Up Next</h1>
-        <span className="text-xs bg-amber-100 text-amber-700 border border-amber-300 px-3 py-1 rounded-full">
-          {movies.length} movies · {readyCount} ready
-        </span>
+        {!loading && (
+          <span className="text-xs bg-amber-100 text-amber-700 border border-amber-300 px-3 py-1 rounded-full">
+            {movies.length} movies · {readyCount} ready
+          </span>
+        )}
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={movies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
-          {movies.map((movie, index) => (
-            <MovieRow
-              key={movie.id}
-              movie={movie}
-              position={index + 1}
-              onMarkWatched={setRatingTarget}
-              onForceDownload={handleForceDownload}
-            />
+      {loading ? (
+        // Loading skeleton
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 bg-white border border-amber-100 rounded-xl px-4 py-3 animate-pulse"
+            >
+              <div className="w-5 h-5 bg-amber-100 rounded" />
+              <div className="w-5 h-5 bg-amber-100 rounded" />
+              <div className="w-9 h-14 bg-amber-100 rounded flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-amber-100 rounded w-2/3" />
+                <div className="h-2 bg-amber-50 rounded w-1/3" />
+              </div>
+              <div className="w-16 h-5 bg-amber-100 rounded-full" />
+            </div>
           ))}
-        </SortableContext>
-      </DndContext>
-
-      {movies.length === 0 && (
-        <div className="text-center text-amber-600 mt-16">
-          <div className="text-5xl mb-4">🎬</div>
-          <p className="font-medium">No movies yet</p>
-          <p className="text-sm text-amber-500 mt-1">Add some from the sidebar</p>
         </div>
+      ) : (
+        <>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={movies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
+              {movies.map((movie, index) => (
+                <MovieRow
+                  key={movie.id}
+                  movie={movie}
+                  position={index + 1}
+                  onMarkWatched={setRatingTarget}
+                  onForceDownload={handleForceDownload}
+                  onRemove={handleRemove}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+
+          {movies.length === 0 && (
+            <div className="text-center text-amber-600 mt-16">
+              <div className="text-5xl mb-4">🎬</div>
+              <p className="font-medium">No movies yet</p>
+              <p className="text-sm text-amber-500 mt-1">Add some from the sidebar</p>
+            </div>
+          )}
+        </>
       )}
 
       {ratingTarget && (

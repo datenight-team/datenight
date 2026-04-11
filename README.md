@@ -129,6 +129,33 @@ tests/             # Vitest test files
 server.ts          # Custom Next.js server (starts sync job in production)
 ```
 
+## Troubleshooting
+
+**Movies show "Not Requested" and never download**
+Seerr integration is failing silently. Check that `SEERR_URL` and `SEERR_API_KEY` are correct and that the container can reach Seerr. The sync job runs every 5 minutes — check container logs: `docker logs datenight`.
+
+**Plex playlist isn't updating**
+Check `PLEX_URL` and `PLEX_TOKEN`. The Plex token expires occasionally; get a fresh one from Settings → Troubleshooting → Get Token in the Plex UI. The playlist syncs as part of the same 5-minute cron job as Seerr.
+
+**Add Movie shows an error for a valid URL**
+The `TMDB_API_KEY` is likely missing or wrong. Test it: `curl "https://api.themoviedb.org/3/movie/550?api_key=YOUR_KEY"` — should return JSON, not an auth error.
+
+**The app starts but the database is empty after a restart**
+The data volume isn't persisted. Check your `docker-compose.yml` volume config. With the named volume (`datenight-data`), data survives container restarts automatically. If you switched from a bind mount, the old data is still at the bind mount path.
+
+**Inspecting or editing the database directly**
+```bash
+# Local dev — opens a browser GUI at localhost:5555
+npx prisma studio
+
+# Production — open a shell in the container
+docker exec -it datenight sh
+# The database file is at /app/data/datenight.db
+```
+
+**Container won't start / exits immediately**
+Check logs: `docker logs datenight`. The most common cause is a missing environment variable or a database migration failure on first boot.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

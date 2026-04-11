@@ -1,5 +1,6 @@
 // src/components/movie-row.tsx
 'use client'
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Image from 'next/image'
@@ -12,9 +13,12 @@ interface MovieRowProps {
   position: number
   onMarkWatched: (movie: Movie) => void
   onForceDownload: (movieId: number) => void
+  onRemove: (movieId: number) => void
 }
 
-export function MovieRow({ movie, position, onMarkWatched, onForceDownload }: MovieRowProps) {
+export function MovieRow({ movie, position, onMarkWatched, onForceDownload, onRemove }: MovieRowProps) {
+  const [confirming, setConfirming] = useState(false)
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: movie.id })
 
@@ -89,6 +93,35 @@ export function MovieRow({ movie, position, onMarkWatched, onForceDownload }: Mo
           >
             Download Now
           </Button>
+        )}
+        {/* Remove — two-tap confirm so it's hard to trigger accidentally */}
+        {confirming ? (
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-xs border-red-300 text-red-600 hover:bg-red-50"
+              onClick={() => onRemove(movie.id)}
+            >
+              Remove
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-xs border-stone-200 text-stone-400 hover:bg-stone-50"
+              onClick={() => setConfirming(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirming(true)}
+            className="text-stone-300 hover:text-red-400 text-xs transition-colors"
+            aria-label="Remove from list"
+          >
+            ✕
+          </button>
         )}
       </div>
     </div>
