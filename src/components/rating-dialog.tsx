@@ -1,0 +1,172 @@
+// src/components/rating-dialog.tsx
+'use client'
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { StarRating } from './star-rating'
+import type { Movie, User, Rating } from '@/types'
+
+type Step = 'who' | 'form' | 'waiting' | 'reveal'
+
+interface RatingDialogProps {
+  movie: Movie
+  open: boolean
+  onClose: () => void
+  onComplete: () => void
+}
+
+const userName: Record<User, string> = { ian: 'Ian', krista: 'Krista' }
+
+export function RatingDialog({ movie, open, onClose, onComplete }: RatingDialogProps) {
+  const [step, setStep] = useState<Step>('who')
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [stars, setStars] = useState(0)
+  const [quote, setQuote] = useState('')
+  const [ratings, setRatings] = useState<Rating[]>([])
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Mark as watched first, then show rating UI
+  const handleUserSelect = async (user: User) => {
+    if (step === 'who') {
+      // On first user: call /watched to trigger Seerr delete + status update
+      await fetch(`/api/movies/${movie.id}/watched`, { method: 'POST' })
+    }
+    setCurrentUser(user)
+    setStep('form')
+  }
+
+  const handleSubmit = async () => {
+    if (!currentUser || stars === 0 || !quote.trim()) {
+      setError("Please give a star rating and write your critic's quote.")
+      return
+    }
+    setError(null)
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movieId: movie.id, user: currentUser, stars, quote }),
+      })
+      const data = await res.json()
+      setRatings(data.ratings)
+      setStars(0)
+      setQuote('')
+
+      if (data.complete) {
+        setStep('reveal')
+        onComplete()
+      } else {
+        const other: User = currentUser === 'ian' ? 'krista' : 'ian'
+        setCurrentUser(other)
+        setStep('waiting')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const otherUser: User | null = currentUser
+    ? currentUser === 'ian' ? 'krista' : 'ian'
+    : null
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="text-amber-900">{movie.title}</DialogTitle>
+        </DialogHeader>
+
+        {step === 'who' && (
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-stone-600">Who&apos;s rating this one?</p>
+            {(['ian', 'krista'] as User[]).map((user) => (
+              <Button
+                key={user}
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() => handleUserSelect(user)}
+              >
+                {userName[user]}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {step === 'form' && currentUser && (
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-stone-600">
+              {userName[currentUser]}&apos;s rating for <em>{movie.title}</em>
+            </p>
+            <div>
+              <p className="text-xs text-stone-500 mb-1">Stars</p>
+              <StarRating value={stars} onChange={setStars} size="lg" />
+            </div>
+            <div>
+              <p className="text-xs text-stone-500 mb-1">Critic&apos;s Quote</p>
+              <Textarea
+                placeholder="A sentence or two about the film..."
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+                className="border-amber-300 focus:ring-amber-400 resize-none"
+                rows={3}
+              />
+            </div>
+            {error && <p className="text-red-600 text-xs">{error}</p>}
+            <Button
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting ? 'Submitting…' : 'Submit'}
+            </Button>
+          </div>
+        )}
+
+        {step === 'waiting' && otherUser && (
+          <div className="space-y-4 py-2 text-center">
+            <p className="text-3xl">⏳</p>
+            <p className="text-sm text-stone-600">
+              Waiting for <strong>{userName[otherUser]}</strong> to add their rating…
+            </p>
+            <Button
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={() => handleUserSelect(otherUser)}
+            >
+              I&apos;m {userName[otherUser]} — Rate Now
+            </Button>
+          </div>
+        )}
+
+        {step === 'reveal' && (
+          <div className="space-y-4 py-2">
+            <p className="text-center text-2xl">🎉</p>
+            <p className="text-sm text-center text-stone-600 font-medium">Ratings revealed!</p>
+            {ratings.map((r) => (
+              <div key={r.user} className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold text-amber-900 text-sm">{userName[r.user as User]}</span>
+                  <StarRating value={r.stars} readonly size="sm" />
+                </div>
+                <p className="text-stone-600 text-xs italic">&ldquo;{r.quote}&rdquo;</p>
+              </div>
+            ))}
+            <Button
+              variant="outline"
+              className="w-full border-amber-300 text-amber-700"
+              onClick={onClose}
+            >
+              Done
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
