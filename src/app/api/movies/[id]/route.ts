@@ -4,9 +4,10 @@ import { prisma } from '@/lib/db'
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10)
+  const { id: rawId } = await params
+  const id = parseInt(rawId, 10)
   await prisma.movie.delete({ where: { id } })
   return NextResponse.json({ ok: true })
 }

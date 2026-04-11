@@ -5,9 +5,10 @@ import { deleteMedia } from '@/lib/seerr'
 
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10)
+  const { id: rawId } = await params
+  const id = parseInt(rawId, 10)
   const movie = await prisma.movie.findUnique({ where: { id } })
   if (!movie) return NextResponse.json({ error: 'not found' }, { status: 404 })
 
