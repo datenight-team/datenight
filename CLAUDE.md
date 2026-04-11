@@ -4,22 +4,13 @@ A home-lab web app for Ian and Krista to manage their Criterion Collection date 
 
 ## Project Status
 
-**Implementation in progress — Tasks 1–9 of 18 complete.**
-
-Completed: scaffolding, Docker config, Prisma schema, shared types, URL parser, TMDB/Seerr/Plex clients, sync service.
-Remaining: API routes (Tasks 10–11), UI pages (Tasks 12–17), final wiring (Task 18).
+**Implementation complete. All 18 tasks done. 49/49 tests passing. Build clean.**
 
 ## Key Documents
 
 - **Design spec:** `docs/superpowers/specs/2026-04-10-datenight-design.md`
 - **Implementation plan:** `docs/superpowers/plans/2026-04-10-datenight.md`
 - **UI mockups:** `docs/mockups/` (open in any browser)
-
-## To Resume Implementation
-
-Read the implementation plan and execute it task by task **starting at Task 10** using the `superpowers:subagent-driven-development` skill (or `superpowers:executing-plans` for inline execution).
-
-No need for a worktree. Just work on the main branch for now.
 
 ## Tech Stack
 
