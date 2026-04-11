@@ -54,15 +54,27 @@ export async function searchByTitle(
 export async function lookupCriterionSlug(
   slug: string
 ): Promise<TmdbMovieDetails | null> {
-  const res = await fetch(`https://www.criterion.com/films/${slug}`)
-  if (!res.ok) return null
-  const html = await res.text()
-  const match = html.match(
-    /<meta property="og:title" content="([^"]+)"/
-  )
-  if (!match) return null
-  const title = match[1]
-    .replace(/ \| The Criterion Collection$/, '')
-    .trim()
+  // Try scraping the Criterion page for the canonical title first.
+  // This is blocked by Cloudflare in many server environments, so we
+  // fall back to deriving the title from the slug.
+  try {
+    const res = await fetch(`https://www.criterion.com/films/${slug}`)
+    if (res.ok) {
+      const html = await res.text()
+      const match = html.match(/<meta property="og:title" content="([^"]+)"/)
+      if (match) {
+        const title = match[1].replace(/ \| The Criterion Collection$/, '').trim()
+        const movie = await searchByTitle(title)
+        if (movie) return movie
+      }
+    }
+  } catch {
+    // fall through
+  }
+
+  // Fallback: derive title from slug. Format is "{numeric-id}-{title-with-dashes}"
+  // e.g. "27910-3-10-to-yuma" → "3 10 to yuma"
+  const titleSlug = slug.replace(/^\d+-/, '')
+  const title = titleSlug.replace(/-/g, ' ')
   return searchByTitle(title)
 }
