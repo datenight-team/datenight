@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Movie {
+  id             Int         @id @default(autoincrement())
+  title          String
+  year           Int
+  runtime        Int
+  description    String
+  posterUrl      String
+  imdbId         String      @unique
+  tmdbId         Int         @unique
+  criterionUrl   String?
+  imdbUrl        String?
+  sortOrder      Int
+  status         String      @default("watchlist")
+  seerrRequestId String?
+  seerrMediaId   String?
+  seerrStatus    String      @default("not_requested")
+  watchedAt      DateTime?
+  createdAt      DateTime    @default(now())
+  ratings        Rating[]
+}
+
+model Rating {
+  id          Int      @id @default(autoincrement())
+  movieId     Int
+  user        String
+  stars       Int
+  quote       String
+  submittedAt DateTime @default(now())
+  movie       Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, user])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
