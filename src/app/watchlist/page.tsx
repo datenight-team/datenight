@@ -13,8 +13,10 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
 import { FilterBar } from '@/components/filter-bar'
-import type { Movie, User } from '@/types'
+import type { Movie, User, SeerrStatus } from '@/types'
 
+// 'deleted' is intentionally omitted — it's a transient Seerr state with no
+// useful filter action for the user on the watchlist.
 const STATUS_BUTTONS = [
   { label: 'Not Requested', value: 'not_requested' },
   { label: 'Queued', value: 'pending' },
@@ -28,7 +30,7 @@ export default function WatchlistPage() {
   const [ratingTarget, setRatingTarget] = useState<Movie | null>(null)
   const [userNames, setUserNames] = useState<Record<User, string>>({ user1: 'User 1', user2: 'User 2' })
   const [search, setSearch] = useState('')
-  const [activeStatus, setActiveStatus] = useState<string | null>(null)
+  const [activeStatus, setActiveStatus] = useState<SeerrStatus | null>(null)
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
@@ -47,9 +49,13 @@ export default function WatchlistPage() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  const filteredMovies = movies
-    .filter((m) => m.title.toLowerCase().includes(search.toLowerCase()))
-    .filter((m) => activeStatus === null || m.seerrStatus === activeStatus)
+  const isFiltered = search !== '' || activeStatus !== null
+  const lowerSearch = search.toLowerCase()
+  const filteredMovies = movies.filter(
+    (m) =>
+      m.title.toLowerCase().includes(lowerSearch) &&
+      (activeStatus === null || m.seerrStatus === activeStatus)
+  )
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
@@ -120,7 +126,7 @@ export default function WatchlistPage() {
             onButtonChange={setActiveStatus}
           />
 
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={isFiltered ? undefined : handleDragEnd}>
             <SortableContext items={filteredMovies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
               {filteredMovies.map((movie, index) => (
                 <MovieRow

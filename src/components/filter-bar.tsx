@@ -11,7 +11,7 @@ interface FilterBarProps {
   onSearchChange: (value: string) => void
   buttons: FilterButton[]
   activeButton: string | null
-  onButtonChange: (value: string | null) => void
+  onButtonChange: (value: any) => void
 }
 
 export function FilterBar({
