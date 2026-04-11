@@ -24,6 +24,26 @@ Next.js 14 · TypeScript · Tailwind CSS · shadcn/ui · dnd-kit · Prisma + SQL
 - **Vitest with no tests**: Add `passWithNoTests: true` to `vitest.config.ts` so `npm run test:run` exits 0 when no test files exist yet.
 - **seerrMediaId type**: Seerr returns `mediaInfo.id` as a number, but the Prisma schema stores it as `String?`. Always `String()` convert before writing to the DB.
 
+## Running Locally Without Seerr/Plex
+
+`npm run dev` skips the sync job entirely (cron only starts in production via `server.ts`). Set `SEERR_URL`/`PLEX_URL` to any fake value — all client calls fail gracefully and return safe defaults (`not_requested`, `null`, `false`). Only `TMDB_API_KEY` needs to be real to use the Add Movie flow. Everything else — watchlist, drag/drop, ratings, watched view — works fully offline.
+
+## Bulk Import
+
+To import an existing film list from a CSV (e.g. exported from Google Sheets):
+
+```bash
+# Local dev
+npm run import ~/Downloads/criterion.csv [optional-column-name]
+
+# Production (Docker)
+docker cp criterion.csv datenight:/app/data/criterion.csv
+docker exec datenight node_modules/.bin/tsx scripts/import-csv.ts /app/data/criterion.csv
+docker exec datenight rm /app/data/criterion.csv
+```
+
+Script is at `scripts/import-csv.ts`. Auto-detects common column names (`Title`, `Film`, `Movie`, etc.).
+
 ## Quick Design Reference
 
 | Decision | Choice |
