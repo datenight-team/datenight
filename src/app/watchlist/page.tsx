@@ -27,6 +27,7 @@ export default function WatchlistPage() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMovies()
     fetch('/api/user-names')
       .then((r) => r.json())
