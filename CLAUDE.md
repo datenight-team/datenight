@@ -4,7 +4,9 @@ A home-lab web app for Ian and Krista to manage their Criterion Collection date 
 
 ## Project Status
 
-**Implementation complete. All 18 tasks done. 49/49 tests passing. Build clean.**
+**Implementation complete and extended beyond original 18-task plan. 49/49 tests passing. Build clean.**
+
+Post-plan additions: configurable user names, thumbs up/down rating system, delete button on movie rows, loading skeletons, bulk CSV import, Claude-powered recommendations, GitHub Actions CI.
 
 ## Key Documents
 
@@ -14,7 +16,7 @@ A home-lab web app for Ian and Krista to manage their Criterion Collection date 
 
 ## Tech Stack
 
-Next.js 14 · TypeScript · Tailwind CSS · shadcn/ui · dnd-kit · Prisma + SQLite · node-cron · tsx · Vitest · Docker
+Next.js 14 · TypeScript · Tailwind CSS · shadcn/ui · dnd-kit · Prisma + SQLite · node-cron · tsx · Vitest · Docker · Anthropic SDK (Claude Opus 4.6)
 
 ## Implementation Notes (learned during build)
 

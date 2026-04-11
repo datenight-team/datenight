@@ -11,7 +11,7 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
 - **Seerr integration** — top 10 unwatched movies are automatically requested for download; status shown per movie (Queued / Downloading / Ready)
 - **Plex integration** — a "Date Night" playlist is kept in sync with available movies in watch order
 - **Blind ratings** — each person gives a thumbs up or down and writes a critic's quote independently (Siskel & Ebert style); results are revealed only after both have rated, with 🤝 if you agreed and ⚔️ if you didn't
-- **Recommendations** — Claude Opus analyzes your agreed-upon films and recommends 2 consensus picks (films you&apos;ll both likely 👍) and 1 wild card (a deliberate push outside your comfort zone); optional Criterion-only filter
+- **Recommendations** — Claude Opus analyzes your agreed-upon films and recommends 2 consensus picks (films you'll both likely 👍) and 1 wild card (a deliberate push outside your comfort zone); optional Criterion-only filter
 - **Ask Claude** — sidebar link opens Claude with a pre-filled prompt based on recently watched films
 - **Warm amber theme** — cozy UI, not a media server dashboard
 
@@ -119,18 +119,21 @@ npm test           # watch mode
 ```
 src/
   app/
-    api/           # Next.js API routes
-    watchlist/     # Draggable watch list page
-    watched/       # Grid of watched + reviewed movies
-    add/           # URL paste → preview → add flow
-  components/      # Shared UI components
-  lib/             # Server-side clients (TMDB, Seerr, Plex, sync)
-  types/           # Shared TypeScript interfaces
+    api/              # Next.js API routes
+    watchlist/        # Draggable watch list page
+    watched/          # Grid of watched + reviewed movies
+    add/              # URL paste → preview → add flow
+    recommendations/  # Claude-powered film recommendations
+  components/         # Shared UI components
+  lib/                # Server-side clients (TMDB, Seerr, Plex, Claude, sync)
+  types/              # Shared TypeScript interfaces
 prisma/
-  schema.prisma    # Movie, Rating, Setting models
-  migrations/      # SQLite migrations
-tests/             # Vitest test files
-server.ts          # Custom Next.js server (starts sync job in production)
+  schema.prisma       # Movie, Rating, Setting models
+  migrations/         # SQLite migrations
+scripts/
+  import-csv.ts       # Bulk import from CSV / Google Sheets export
+tests/                # Vitest test files
+server.ts             # Custom Next.js server (starts sync job in production)
 ```
 
 ## Troubleshooting
@@ -156,6 +159,9 @@ npx prisma studio
 docker exec -it datenight sh
 # The database file is at /app/data/datenight.db
 ```
+
+**Recommendations page shows an error or returns nothing useful**
+Make sure `ANTHROPIC_API_KEY` is set and valid. The feature requires at least a few watched and rated films to work well — the more films you've both rated, the better the recommendations. If you have no agreed films yet, it will still work but with less context.
 
 **Container won't start / exits immediately**
 Check logs: `docker logs datenight`. The most common cause is a missing environment variable or a database migration failure on first boot.
