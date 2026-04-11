@@ -24,15 +24,15 @@ describe('POST /api/ratings', () => {
 
   it('creates a rating and returns incomplete when only one rating exists', async () => {
     vi.mocked(prisma.rating.create).mockResolvedValue({
-      id: 1, movieId: 1, user: 'user1', stars: 4, quote: 'Epic!', submittedAt: new Date(),
+      id: 1, movieId: 1, user: 'user1', rating: 'up', quote: 'A masterpiece.', submittedAt: new Date(),
     } as any)
     vi.mocked(prisma.rating.findMany).mockResolvedValue([
-      { user: 'user1', stars: 4, quote: 'Epic!' },
+      { user: 'user1', rating: 'up', quote: 'A masterpiece.' },
     ] as any)
 
     const req = new Request('http://localhost/api/ratings', {
       method: 'POST',
-      body: JSON.stringify({ movieId: 1, user: 'user1', stars: 4, quote: 'Epic!' }),
+      body: JSON.stringify({ movieId: 1, user: 'user1', rating: 'up', quote: 'A masterpiece.' }),
     })
     const res = await POST_RATING(req)
     expect(res.status).toBe(201)
@@ -41,18 +41,18 @@ describe('POST /api/ratings', () => {
     expect(data.ratings).toHaveLength(1)
   })
 
-  it('returns complete=true and both ratings when both users have rated', async () => {
+  it('returns complete=true when both users have rated', async () => {
     vi.mocked(prisma.rating.create).mockResolvedValue({
-      id: 2, movieId: 1, user: 'user2', stars: 5, quote: 'Masterpiece!', submittedAt: new Date(),
+      id: 2, movieId: 1, user: 'user2', rating: 'down', quote: 'Not for me.', submittedAt: new Date(),
     } as any)
     vi.mocked(prisma.rating.findMany).mockResolvedValue([
-      { user: 'user1', stars: 4, quote: 'Epic!' },
-      { user: 'user2', stars: 5, quote: 'Masterpiece!' },
+      { user: 'user1', rating: 'up', quote: 'A masterpiece.' },
+      { user: 'user2', rating: 'down', quote: 'Not for me.' },
     ] as any)
 
     const req = new Request('http://localhost/api/ratings', {
       method: 'POST',
-      body: JSON.stringify({ movieId: 1, user: 'user2', stars: 5, quote: 'Masterpiece!' }),
+      body: JSON.stringify({ movieId: 1, user: 'user2', rating: 'down', quote: 'Not for me.' }),
     })
     const res = await POST_RATING(req)
     const data = await res.json()
@@ -60,10 +60,10 @@ describe('POST /api/ratings', () => {
     expect(data.ratings).toHaveLength(2)
   })
 
-  it('returns 422 for invalid stars value', async () => {
+  it('returns 422 for invalid rating value', async () => {
     const req = new Request('http://localhost/api/ratings', {
       method: 'POST',
-      body: JSON.stringify({ movieId: 1, user: 'user1', stars: 6, quote: 'hi' }),
+      body: JSON.stringify({ movieId: 1, user: 'user1', rating: 'sideways', quote: 'Hmm.' }),
     })
     expect((await POST_RATING(req)).status).toBe(422)
   })
@@ -71,7 +71,7 @@ describe('POST /api/ratings', () => {
   it('returns 422 for empty quote', async () => {
     const req = new Request('http://localhost/api/ratings', {
       method: 'POST',
-      body: JSON.stringify({ movieId: 1, user: 'user1', stars: 3, quote: '   ' }),
+      body: JSON.stringify({ movieId: 1, user: 'user1', rating: 'up', quote: '   ' }),
     })
     expect((await POST_RATING(req)).status).toBe(422)
   })

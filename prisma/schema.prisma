@@ -32,7 +32,7 @@ model Rating {
   id          Int      @id @default(autoincrement())
   movieId     Int
   user        String
-  stars       Int
+  rating      String
   quote       String
   submittedAt DateTime @default(now())
   movie       Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)

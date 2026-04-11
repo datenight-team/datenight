@@ -1,7 +1,7 @@
 // src/components/movie-card.tsx
 import Image from 'next/image'
-import { StarRating } from './star-rating'
-import type { Movie, Rating, User } from '@/types'
+import { ThumbRating } from './thumb-rating'
+import type { Movie, Rating, User, RatingValue } from '@/types'
 
 interface MovieCardProps {
   movie: Movie
@@ -11,6 +11,8 @@ interface MovieCardProps {
 export function MovieCard({ movie, userNames }: MovieCardProps) {
   const ratings = movie.ratings ?? []
   const bothRated = ratings.length === 2
+
+  const agreed = bothRated && ratings[0].rating === ratings[1].rating
 
   return (
     <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-sm">
@@ -26,7 +28,14 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
       {/* Info */}
       <div className="p-3">
         <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">{movie.title}</h3>
-        <p className="text-stone-400 text-xs mb-3">{movie.year}</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-stone-400 text-xs">{movie.year}</p>
+          {bothRated && (
+            <span className="text-xs text-stone-400" title={agreed ? 'You agreed' : 'You disagreed'}>
+              {agreed ? '🤝' : '⚔️'}
+            </span>
+          )}
+        </div>
 
         {bothRated ? (
           <div className="space-y-2">
@@ -34,7 +43,7 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
               <div key={r.user} className="bg-amber-50 rounded-lg p-2">
                 <div className="flex justify-between items-center mb-0.5">
                   <span className="text-xs font-semibold text-amber-900">{userNames[r.user as User]}</span>
-                  <StarRating value={r.stars} readonly size="sm" />
+                  <ThumbRating value={r.rating as RatingValue} readonly size="sm" />
                 </div>
                 <p className="text-xs text-stone-500 italic line-clamp-2">&ldquo;{r.quote}&rdquo;</p>
               </div>

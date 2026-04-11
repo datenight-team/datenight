@@ -9,9 +9,9 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { StarRating } from './star-rating'
+import { ThumbRating } from './thumb-rating'
 import { otherUser, USER_KEYS } from '@/lib/users'
-import type { Movie, User, Rating } from '@/types'
+import type { Movie, User, Rating, RatingValue } from '@/types'
 
 type Step = 'who' | 'form' | 'waiting' | 'reveal'
 
@@ -26,7 +26,7 @@ interface RatingDialogProps {
 export function RatingDialog({ movie, open, onClose, onComplete, userNames }: RatingDialogProps) {
   const [step, setStep] = useState<Step>('who')
   const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [stars, setStars] = useState(0)
+  const [rating, setRating] = useState<RatingValue | undefined>(undefined)
   const [quote, setQuote] = useState('')
   const [ratings, setRatings] = useState<Rating[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -34,16 +34,17 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
 
   const handleUserSelect = async (user: User) => {
     if (step === 'who') {
-      // On first user: call /watched to trigger Seerr delete + status update
       await fetch(`/api/movies/${movie.id}/watched`, { method: 'POST' })
     }
     setCurrentUser(user)
+    setRating(undefined)
+    setQuote('')
     setStep('form')
   }
 
   const handleSubmit = async () => {
-    if (!currentUser || stars === 0 || !quote.trim()) {
-      setError("Please give a star rating and write your critic's quote.")
+    if (!currentUser || !rating || !quote.trim()) {
+      setError('Please give a verdict and write your critic\'s quote.')
       return
     }
     setError(null)
@@ -52,11 +53,11 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
       const res = await fetch('/api/ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId: movie.id, user: currentUser, stars, quote }),
+        body: JSON.stringify({ movieId: movie.id, user: currentUser, rating, quote }),
       })
       const data = await res.json()
       setRatings(data.ratings)
-      setStars(0)
+      setRating(undefined)
       setQuote('')
 
       if (data.complete) {
@@ -98,11 +99,11 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
         {step === 'form' && currentUser && (
           <div className="space-y-4 py-2">
             <p className="text-sm text-stone-600">
-              {userNames[currentUser]}&apos;s rating for <em>{movie.title}</em>
+              {userNames[currentUser]}&apos;s verdict on <em>{movie.title}</em>
             </p>
             <div>
-              <p className="text-xs text-stone-500 mb-1">Stars</p>
-              <StarRating value={stars} onChange={setStars} size="lg" />
+              <p className="text-xs text-stone-500 mb-2">Verdict</p>
+              <ThumbRating value={rating} onChange={setRating} size="lg" />
             </div>
             <div>
               <p className="text-xs text-stone-500 mb-1">Critic&apos;s Quote</p>
@@ -129,7 +130,7 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
           <div className="space-y-4 py-2 text-center">
             <p className="text-3xl">⏳</p>
             <p className="text-sm text-stone-600">
-              Waiting for <strong>{userNames[other]}</strong> to add their rating…
+              Waiting for <strong>{userNames[other]}</strong> to weigh in…
             </p>
             <Button
               className="w-full bg-amber-600 hover:bg-amber-700 text-white"
@@ -142,13 +143,19 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
 
         {step === 'reveal' && (
           <div className="space-y-4 py-2">
-            <p className="text-center text-2xl">🎉</p>
-            <p className="text-sm text-center text-stone-600 font-medium">Ratings revealed!</p>
+            <p className="text-center text-2xl">
+              {ratings.length === 2 && ratings[0].rating === ratings[1].rating ? '🤝' : '⚔️'}
+            </p>
+            <p className="text-sm text-center text-stone-600 font-medium">
+              {ratings.length === 2 && ratings[0].rating === ratings[1].rating
+                ? 'You agree!'
+                : 'You disagree!'}
+            </p>
             {ratings.map((r) => (
               <div key={r.user} className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-semibold text-amber-900 text-sm">{userNames[r.user as User]}</span>
-                  <StarRating value={r.stars} readonly size="sm" />
+                  <ThumbRating value={r.rating} readonly size="sm" />
                 </div>
                 <p className="text-stone-600 text-xs italic">&ldquo;{r.quote}&rdquo;</p>
               </div>

@@ -11,6 +11,8 @@ export type SeerrStatus =
 
 export type User = 'user1' | 'user2'
 
+export type RatingValue = 'up' | 'down'
+
 export interface Movie {
   id: number
   title: string
@@ -36,7 +38,7 @@ export interface Rating {
   id: number
   movieId: number
   user: User
-  stars: number
+  rating: RatingValue
   quote: string
   submittedAt: string
 }
