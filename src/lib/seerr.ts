@@ -61,3 +61,24 @@ export async function deleteMedia(seerrMediaId: number): Promise<boolean> {
     return false
   }
 }
+
+export async function deleteFromService(tmdbId: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${base()}/api/v1/movie/${tmdbId}`, {
+      headers: { 'X-Api-Key': key() },
+    })
+    if (!res.ok) return false
+    const data = await res.json()
+    const media = data.mediaInfo
+    if (!media || media.serviceId === null || media.serviceId === undefined) return false
+    if (media.externalServiceId === null || media.externalServiceId === undefined) return false
+
+    const delRes = await fetch(
+      `${base()}/api/v1/service/radarr/${media.serviceId}/movie/${media.externalServiceId}`,
+      { method: 'DELETE', headers: { 'X-Api-Key': key() } }
+    )
+    return delRes.ok
+  } catch {
+    return false
+  }
+}

@@ -1,7 +1,7 @@
 // src/app/api/movies/[id]/seerr/route.ts
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { deleteMedia } from '@/lib/seerr'
+import { deleteMedia, deleteFromService } from '@/lib/seerr'
 
 export async function DELETE(
   _req: Request,
@@ -13,6 +13,8 @@ export async function DELETE(
   if (!movie) return NextResponse.json({ error: 'not found' }, { status: 404 })
   if (!movie.seerrMediaId) return NextResponse.json({ error: 'no seerr media id' }, { status: 400 })
 
+  // Remove from Radarr via Seerr's service proxy, then remove from Seerr
+  await deleteFromService(movie.tmdbId)
   const ok = await deleteMedia(parseInt(movie.seerrMediaId, 10))
   return NextResponse.json({ ok })
 }

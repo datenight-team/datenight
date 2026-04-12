@@ -13,7 +13,7 @@ vi.mock('@/lib/db', () => ({
     },
   },
 }))
-vi.mock('@/lib/seerr', () => ({ requestMovie: vi.fn(), deleteMedia: vi.fn() }))
+vi.mock('@/lib/seerr', () => ({ requestMovie: vi.fn(), deleteMedia: vi.fn(), deleteFromService: vi.fn() }))
 
 import { prisma } from '@/lib/db'
 import { GET, POST } from '@/app/api/movies/route'
