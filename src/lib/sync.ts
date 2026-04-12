@@ -5,6 +5,22 @@ import { syncDateNightPlaylist } from './plex'
 
 const TOP_N = 10
 
+function getConcurrencyLimit(): number | null {
+  const raw = process.env.SEERR_CONCURRENCY
+  if (raw === undefined || raw === '') return null
+  return parseInt(raw, 10)
+}
+
+async function isRequestingAllowed(): Promise<boolean> {
+  const limit = getConcurrencyLimit()
+  if (limit === null) return true   // no limit set — original behaviour
+  if (limit === 0) return false     // disabled
+  const active = await prisma.movie.count({
+    where: { seerrStatus: { in: ['pending', 'processing'] } },
+  })
+  return active < limit
+}
+
 export async function runSync(): Promise<void> {
   const watchlist = await prisma.movie.findMany({
     where: { status: 'watchlist' },
@@ -12,8 +28,11 @@ export async function runSync(): Promise<void> {
     take: TOP_N,
   })
 
+  const canRequest = await isRequestingAllowed()
+
   for (const movie of watchlist) {
     if (!movie.seerrRequestId) {
+      if (!canRequest) continue
       const result = await requestMovie(movie.tmdbId)
       if (result) {
         await prisma.movie.update({
@@ -46,7 +65,6 @@ export async function runSync(): Promise<void> {
 }
 
 export function startSyncJob(): void {
-  // Dynamically import node-cron to avoid loading it in tests
   import('node-cron').then(({ default: cron }) => {
     cron.schedule('*/5 * * * *', async () => {
       console.log('[sync] Running...')
