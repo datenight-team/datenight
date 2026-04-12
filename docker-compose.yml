@@ -12,9 +12,13 @@
 services:
   datenight:
     build: .
+    container_name: datenight
     image: datenight:latest
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: "1.0"
     ports:
-      - "3000:3000"
+      - "8765:3000"
     volumes:
       - datenight-data:/app/data
     environment:
@@ -28,8 +32,10 @@ services:
       - USER2_NAME=${USER2_NAME:-User 2}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
     restart: unless-stopped
+    networks:
+      - proxy
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/sync"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -37,3 +43,7 @@ services:
 
 volumes:
   datenight-data:
+
+networks:
+  proxy:
+    external: true
