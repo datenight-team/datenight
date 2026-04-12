@@ -19,6 +19,7 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
   const agreed = bothRated && ratings[0].rating === ratings[1].rating
 
   const handleCleanup = async () => {
+    if (cleanupState === 'loading') return
     setCleanupState('loading')
     try {
       const res = await fetch(`/api/movies/${movie.id}/seerr`, { method: 'DELETE' })
