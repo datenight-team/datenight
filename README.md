@@ -9,7 +9,7 @@
 
 A home-lab web app for two people to manage their [Criterion Collection](https://www.criterion.com) date night movie watchlist.
 
-Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Criterion URL, drag to set the watch order, and the app automatically queues downloads via Seerr and keeps a "Date Night" Plex playlist in sync.
+Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Criterion URL, drag to set the watch order, and the app automatically queues downloads via Seerr and keeps a "Date Night" Plex collection in sync.
 
 ## Screenshots
 
@@ -26,7 +26,7 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
 - **Add movies** by pasting an IMDB or Criterion Collection URL — metadata pulled from TMDB automatically
 - **Drag to reorder** the watchlist (dnd-kit sortable)
 - **Seerr integration** — top 10 unwatched movies are automatically requested for download; status shown per movie (Queued / Downloading / Ready)
-- **Plex integration** — a "Date Night" playlist is kept in sync with available movies in watch order
+- **Plex integration** — a "Date Night" collection is kept in sync with available movies in watch order; a **Sync Plex** button in the sidebar triggers an on-demand update
 - **Blind ratings** — each person gives a thumbs up or down and writes a critic's quote independently (Siskel & Ebert style); results are revealed only after both have rated, with 🤝 if you agreed and ⚔️ if you didn't
 - **Recommendations** — Claude Opus analyzes your agreed-upon films and recommends 2 consensus picks (films you'll both likely 👍) and 1 wild card (a deliberate push outside your comfort zone); optional Criterion-only filter
 - **Ask Claude** — sidebar link opens Claude with a pre-filled prompt based on recently watched films
@@ -144,8 +144,8 @@ server.ts             # Custom Next.js server (starts sync job in production)
 **Movies show "Not Requested" and never download**
 Seerr integration is failing silently. Check that `SEERR_URL` and `SEERR_API_KEY` are correct and that the container can reach Seerr. The sync job runs every 5 minutes — check logs: `make docker-logs`.
 
-**Plex playlist isn't updating**
-Check `PLEX_URL` and `PLEX_TOKEN`. The Plex token expires occasionally; get a fresh one from Settings → Troubleshooting → Get Token in the Plex UI. The playlist syncs as part of the same 5-minute cron job as Seerr.
+**Plex collection isn't updating**
+Check `PLEX_URL` and `PLEX_TOKEN`. The Plex token expires occasionally; get a fresh one from Settings → Troubleshooting → Get Token in the Plex UI. The collection syncs as part of the same 5-minute cron job as Seerr, or use the **🎭 Sync Plex** button in the sidebar for an immediate update.
 
 **Add Movie shows an error for a valid URL**
 The `TMDB_API_KEY` is likely missing or wrong. Test it: `curl "https://api.themoviedb.org/3/movie/550?api_key=YOUR_KEY"` — should return JSON, not an auth error.

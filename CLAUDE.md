@@ -1,12 +1,12 @@
 # Date Night
 
-A home-lab web app for two people to manage their Criterion Collection date night movie watchlist. Runs in Docker alongside their *arr stack. Integrates with Seerr (download management) and Plex (playlist management).
+A home-lab web app for two people to manage their Criterion Collection date night movie watchlist. Runs in Docker alongside their *arr stack. Integrates with Seerr (download management) and Plex (collection management).
 
 ## Project Status
 
-**Implementation complete and extended beyond original 18-task plan. 49/49 tests passing. Build clean.**
+**Implementation complete and extended beyond original 18-task plan. 68/68 tests passing. Build clean.**
 
-Post-plan additions: configurable user names, thumbs up/down rating system, delete button on movie rows, loading skeletons, bulk CSV import, Claude-powered recommendations, GitHub Actions CI.
+Post-plan additions: configurable user names, thumbs up/down rating system, delete button on movie rows, loading skeletons, bulk CSV import, Claude-powered recommendations, GitHub Actions CI, Plex collection sync (replaced playlist), manual Sync Plex sidebar button, Browse IMDB sidebar link.
 
 
 ## Tech Stack
@@ -20,6 +20,9 @@ Next.js 14 · TypeScript · Tailwind CSS · shadcn/ui · dnd-kit · Prisma + SQL
 - **Next.js 14 + Geist**: `Geist` font is not available via `next/font/google` in Next.js 14 (added in v15). Use `Inter` instead, or install the `geist` npm package.
 - **Vitest with no tests**: Add `passWithNoTests: true` to `vitest.config.ts` so `npm run test:run` exits 0 when no test files exist yet.
 - **seerrMediaId type**: Seerr returns `mediaInfo.id` as a number, but the Prisma schema stores it as `String?`. Always `String()` convert before writing to the DB.
+- **Plex library API auth**: All `/library/...` endpoints require `X-Plex-Client-Identifier`, `X-Plex-Product`, `X-Plex-Version`, and `X-Plex-Platform` headers alongside the token. Without them the server returns 401 even with a valid token. The `/identity` endpoint is unauthenticated so it succeeds regardless — don't use it to validate a token.
+- **Plex GUID lookup broken with modern agent**: The `tv.plex.agents.movie` agent stores IMDB/TMDB IDs as secondary GUIDs in a `Guid[]` array. The `/library/all?guid=imdb://...` endpoint only matches the primary `plex://movie/...` GUID and always returns empty. Use title+year search within the section (`/library/sections/{id}/search?query=...&type=1`) and match by year instead.
+- **Plex collections vs playlists**: Collections are library-scoped (`/library/collections`), require a `sectionId`, and use `type=1` for movies. The sync strategy is delete-then-recreate (simpler than diffing items). The manual sync button (`POST /api/plex-sync`) queries all watchlist movies; the automated cron sync queries only `seerrStatus=available` movies.
 
 ## Running Locally Without Seerr/Plex
 
@@ -62,6 +65,6 @@ Claude is given: all 👍👍 agreed films (primary signal), 👎👎 agreed-dow
 | Movie entry | Paste IMDB or Criterion URL |
 | Rating system | Thumbs up / thumbs down + critic's quote (Siskel & Ebert style) — `rating String` in DB |
 | Reveal | 🤝 if agreed, ⚔️ if disagreed — shown after both submit |
-| Request manager | Seerr |
+| Request manager | Seerr (auto-request top 10 watchlist) |
 | After both rate | Auto-delete from Plex |
 | Architecture | Single Next.js container, SQLite on mounted volume |
