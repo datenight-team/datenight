@@ -1,7 +1,11 @@
 // src/components/movie-card.tsx
+'use client'
+import { useState } from 'react'
 import Image from 'next/image'
 import { ThumbRating } from './thumb-rating'
 import type { Movie, Rating, User, RatingValue } from '@/types'
+
+type CleanupState = 'idle' | 'loading' | 'done' | 'error'
 
 interface MovieCardProps {
   movie: Movie
@@ -9,10 +13,21 @@ interface MovieCardProps {
 }
 
 export function MovieCard({ movie, userNames }: MovieCardProps) {
+  const [cleanupState, setCleanupState] = useState<CleanupState>('idle')
   const ratings = movie.ratings ?? []
   const bothRated = ratings.length === 2
-
   const agreed = bothRated && ratings[0].rating === ratings[1].rating
+
+  const handleCleanup = async () => {
+    setCleanupState('loading')
+    try {
+      const res = await fetch(`/api/movies/${movie.id}/seerr`, { method: 'DELETE' })
+      const data = await res.json()
+      setCleanupState(data.ok ? 'done' : 'error')
+    } catch {
+      setCleanupState('error')
+    }
+  }
 
   return (
     <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-sm">
@@ -53,6 +68,34 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
           <p className="text-xs text-stone-400 italic text-center py-2">
             Waiting for both ratings…
           </p>
+        )}
+
+        {/* Cleanup button — only shown when movie has a Seerr entry */}
+        {movie.seerrMediaId && (
+          <div className="mt-2 pt-2 border-t border-amber-100 text-center">
+            {cleanupState === 'idle' && (
+              <button
+                onClick={handleCleanup}
+                className="text-xs text-stone-400 hover:text-red-400 transition-colors"
+              >
+                🧹 Clean up from Plex
+              </button>
+            )}
+            {cleanupState === 'loading' && (
+              <p className="text-xs text-stone-400">Cleaning up…</p>
+            )}
+            {cleanupState === 'done' && (
+              <p className="text-xs text-green-600">Cleaned up ✓</p>
+            )}
+            {cleanupState === 'error' && (
+              <button
+                onClick={handleCleanup}
+                className="text-xs text-red-500 hover:text-red-600 transition-colors"
+              >
+                Failed — try again
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
