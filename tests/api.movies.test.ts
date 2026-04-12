@@ -13,13 +13,14 @@ vi.mock('@/lib/db', () => ({
     },
   },
 }))
-vi.mock('@/lib/seerr', () => ({ requestMovie: vi.fn() }))
+vi.mock('@/lib/seerr', () => ({ requestMovie: vi.fn(), deleteMedia: vi.fn() }))
 
 import { prisma } from '@/lib/db'
 import { GET, POST } from '@/app/api/movies/route'
 import { DELETE } from '@/app/api/movies/[id]/route'
 import { PATCH } from '@/app/api/movies/[id]/reorder/route'
 import { POST as POST_DOWNLOAD } from '@/app/api/movies/[id]/download/route'
+import { DELETE as DELETE_SEERR } from '@/app/api/movies/[id]/seerr/route'
 import * as seerr from '@/lib/seerr'
 
 const movie = {
@@ -111,5 +112,42 @@ describe('POST /api/movies/[id]/download', () => {
     const res = await POST_DOWNLOAD(req, { params: { id: '1' } })
     expect(res.status).toBe(200)
     expect(seerr.requestMovie).toHaveBeenCalledWith(345911)
+  })
+})
+
+describe('DELETE /api/movies/[id]/seerr', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns 404 when movie not found', async () => {
+    vi.mocked(prisma.movie.findUnique).mockResolvedValue(null)
+    const req = new Request('http://localhost/api/movies/1/seerr', { method: 'DELETE' })
+    const res = await DELETE_SEERR(req, { params: { id: '1' } } as any)
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 400 when seerrMediaId is null', async () => {
+    vi.mocked(prisma.movie.findUnique).mockResolvedValue({ ...movie, seerrMediaId: null } as any)
+    const req = new Request('http://localhost/api/movies/1/seerr', { method: 'DELETE' })
+    const res = await DELETE_SEERR(req, { params: { id: '1' } } as any)
+    expect(res.status).toBe(400)
+  })
+
+  it('returns { ok: true } when Seerr deletion succeeds', async () => {
+    vi.mocked(prisma.movie.findUnique).mockResolvedValue({ ...movie, seerrMediaId: '42' } as any)
+    vi.mocked(seerr.deleteMedia).mockResolvedValue(true)
+    const req = new Request('http://localhost/api/movies/1/seerr', { method: 'DELETE' })
+    const res = await DELETE_SEERR(req, { params: { id: '1' } } as any)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+    expect(seerr.deleteMedia).toHaveBeenCalledWith(42)
+  })
+
+  it('returns { ok: false } when Seerr deletion fails', async () => {
+    vi.mocked(prisma.movie.findUnique).mockResolvedValue({ ...movie, seerrMediaId: '42' } as any)
+    vi.mocked(seerr.deleteMedia).mockResolvedValue(false)
+    const req = new Request('http://localhost/api/movies/1/seerr', { method: 'DELETE' })
+    const res = await DELETE_SEERR(req, { params: { id: '1' } } as any)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: false })
   })
 })
