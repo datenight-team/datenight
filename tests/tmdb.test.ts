@@ -33,7 +33,7 @@ describe('findByImdbId', () => {
 
     const result = await findByImdbId('tt0047478')
     expect(result).toMatchObject({
-      id: 345911,
+      tmdbId: 345911,
       title: 'Seven Samurai',
       year: 1954,
       runtime: 207,

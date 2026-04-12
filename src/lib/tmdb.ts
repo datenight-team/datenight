@@ -13,7 +13,7 @@ async function fetchDetails(tmdbId: number): Promise<TmdbMovieDetails | null> {
   if (!res.ok) return null
   const m = await res.json()
   return {
-    id: m.id,
+    tmdbId: m.id,
     title: m.title,
     year: parseInt((m.release_date || '0').split('-')[0], 10) || 0,
     runtime: m.runtime ?? 0,

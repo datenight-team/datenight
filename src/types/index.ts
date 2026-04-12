@@ -44,7 +44,7 @@ export interface Rating {
 }
 
 export interface TmdbMovieDetails {
-  id: number          // TMDB ID
+  tmdbId: number
   title: string
   year: number
   runtime: number

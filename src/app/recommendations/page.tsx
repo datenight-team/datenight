@@ -62,7 +62,7 @@ export default function RecommendationsPage() {
         description: rec.tmdb.description,
         posterUrl: rec.tmdb.posterUrl,
         imdbId: rec.tmdb.imdbId,
-        tmdbId: rec.tmdb.id,
+        tmdbId: rec.tmdb.tmdbId,
       }),
     })
     // Refresh to show updated alreadyInList state
