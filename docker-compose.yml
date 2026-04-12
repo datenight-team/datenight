@@ -11,7 +11,10 @@
 
 services:
   datenight:
-    build: .
+    build:
+      context: .
+      args:
+        - NEXT_PUBLIC_SEERR_URL=${NEXT_PUBLIC_SEERR_URL:-}
     container_name: datenight
     image: datenight:latest
     mem_limit: 512m

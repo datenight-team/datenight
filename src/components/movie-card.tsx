@@ -43,7 +43,20 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">{movie.title}</h3>
+        <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">
+          {movie.title}
+          {process.env.NEXT_PUBLIC_SEERR_URL && (
+            <a
+              href={`${process.env.NEXT_PUBLIC_SEERR_URL}/movie/${movie.tmdbId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-normal text-xs"
+              title="View in Seerr"
+            >
+              ↗
+            </a>
+          )}
+        </h3>
         <div className="flex items-center justify-between mb-3">
           <p className="text-stone-400 text-xs">{movie.year}</p>
           {bothRated && (
