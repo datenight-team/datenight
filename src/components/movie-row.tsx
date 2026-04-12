@@ -1,8 +1,6 @@
 // src/components/movie-row.tsx
 'use client'
 import { useState } from 'react'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import Image from 'next/image'
 import { StatusBadge } from './status-badge'
 import { Button } from '@/components/ui/button'
@@ -26,15 +24,6 @@ export function MovieRow({ movie, position, onMarkWatched, onForceDownload, onRe
   const [confirming, setConfirming] = useState(false)
   const [askSeerr, setAskSeerr] = useState(false)
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: movie.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
   const handleConfirmRemove = () => {
     setConfirming(false)
     if (movie.seerrMediaId) {
@@ -46,21 +35,7 @@ export function MovieRow({ movie, position, onMarkWatched, onForceDownload, onRe
 
   return (
     <>
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="flex items-center gap-3 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm"
-      >
-        {/* Drag handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          className="text-amber-400 hover:text-amber-600 cursor-grab active:cursor-grabbing text-xl leading-none"
-          aria-label="Drag to reorder"
-        >
-          ⠿
-        </button>
-
+      <div className="flex items-center gap-3 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
         {/* Position */}
         <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0">
           {position}

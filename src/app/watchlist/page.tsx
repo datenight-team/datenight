@@ -1,15 +1,6 @@
 // src/app/watchlist/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
 import { FilterBar } from '@/components/filter-bar'
@@ -24,6 +15,20 @@ const STATUS_BUTTONS = [
   { label: 'Ready', value: 'available' },
 ]
 
+const STATUS_ORDER: Record<string, number> = {
+  available: 0,
+  processing: 1,
+  pending: 2,
+  not_requested: 3,
+}
+
+function sortByStatus(movies: Movie[]): Movie[] {
+  return [...movies].sort(
+    (a, b) =>
+      (STATUS_ORDER[a.seerrStatus] ?? 99) - (STATUS_ORDER[b.seerrStatus] ?? 99)
+  )
+}
+
 export default function WatchlistPage() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
@@ -34,7 +39,7 @@ export default function WatchlistPage() {
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
-    setMovies(data)
+    setMovies(sortByStatus(data))
     setLoading(false)
   }, [])
 
@@ -47,33 +52,12 @@ export default function WatchlistPage() {
       .catch(() => {})
   }, [fetchMovies])
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
-
-  const isFiltered = search !== '' || activeStatus !== null
   const lowerSearch = search.toLowerCase()
   const filteredMovies = movies.filter(
     (m) =>
       m.title.toLowerCase().includes(lowerSearch) &&
       (activeStatus === null || m.seerrStatus === activeStatus)
   )
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = movies.findIndex((m) => m.id === active.id)
-    const newIndex = movies.findIndex((m) => m.id === over.id)
-
-    setMovies(arrayMove(movies, oldIndex, newIndex))
-
-    await fetch(`/api/movies/${active.id}/reorder`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ newIndex }),
-    })
-
-    fetchMovies()
-  }
 
   const handleForceDownload = async (movieId: number) => {
     await fetch(`/api/movies/${movieId}/download`, { method: 'POST' })
@@ -109,7 +93,6 @@ export default function WatchlistPage() {
               className="flex items-center gap-3 bg-white border border-amber-100 rounded-xl px-4 py-3 animate-pulse"
             >
               <div className="w-5 h-5 bg-amber-100 rounded" />
-              <div className="w-5 h-5 bg-amber-100 rounded" />
               <div className="w-9 h-14 bg-amber-100 rounded flex-shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-amber-100 rounded w-2/3" />
@@ -129,20 +112,18 @@ export default function WatchlistPage() {
             onButtonChange={(v) => setActiveStatus(v as SeerrStatus | null)}
           />
 
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={isFiltered ? undefined : handleDragEnd}>
-            <SortableContext items={filteredMovies.map((m) => m.id)} strategy={verticalListSortingStrategy}>
-              {filteredMovies.map((movie, index) => (
-                <MovieRow
-                  key={movie.id}
-                  movie={movie}
-                  position={index + 1}
-                  onMarkWatched={setRatingTarget}
-                  onForceDownload={handleForceDownload}
-                  onRemove={handleRemove}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+          <div>
+            {filteredMovies.map((movie, index) => (
+              <MovieRow
+                key={movie.id}
+                movie={movie}
+                position={index + 1}
+                onMarkWatched={setRatingTarget}
+                onForceDownload={handleForceDownload}
+                onRemove={handleRemove}
+              />
+            ))}
+          </div>
 
           {filteredMovies.length === 0 && (
             <div className="text-center text-amber-600 mt-16">
