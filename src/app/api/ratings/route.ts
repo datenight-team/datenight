@@ -1,21 +1,35 @@
 // src/app/api/ratings/route.ts
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { USER_KEYS } from '@/lib/users'
 
-export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}))
-  const { movieId, user, rating, quote } = body
+interface RatingBody {
+  movieId: number
+  user: string
+  rating: string
+  quote: string
+}
 
-  if (!USER_KEYS.includes(user)) {
+function validateRatingBody(body: Partial<RatingBody>): NextResponse | null {
+  if (!USER_KEYS.includes(body.user as any)) {
     return NextResponse.json({ error: 'invalid user' }, { status: 422 })
   }
-  if (!['up', 'down'].includes(rating)) {
+  if (!['up', 'down'].includes(body.rating ?? '')) {
     return NextResponse.json({ error: 'rating must be "up" or "down"' }, { status: 422 })
   }
-  if (!quote?.trim()) {
+  if (!body.quote?.trim()) {
     return NextResponse.json({ error: 'quote required' }, { status: 422 })
   }
+  return null
+}
+
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => ({}))
+  const invalid = validateRatingBody(body)
+  if (invalid) return invalid
+
+  const { movieId, user, rating, quote } = body as RatingBody
 
   await prisma.rating.create({
     data: { movieId, user, rating, quote: quote.trim() },
@@ -29,17 +43,10 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   const body = await req.json().catch(() => ({}))
-  const { movieId, user, rating, quote } = body
+  const invalid = validateRatingBody(body)
+  if (invalid) return invalid
 
-  if (!USER_KEYS.includes(user)) {
-    return NextResponse.json({ error: 'invalid user' }, { status: 422 })
-  }
-  if (!['up', 'down'].includes(rating)) {
-    return NextResponse.json({ error: 'rating must be "up" or "down"' }, { status: 422 })
-  }
-  if (!quote?.trim()) {
-    return NextResponse.json({ error: 'quote required' }, { status: 422 })
-  }
+  const { movieId, user, rating, quote } = body as RatingBody
 
   try {
     await prisma.rating.update({
@@ -47,11 +54,10 @@ export async function PATCH(req: Request) {
       data: { rating, quote: quote.trim() },
     })
   } catch (err) {
-    const isNotFound =
-      err instanceof Error &&
-      'code' in err &&
-      (err as { code: string }).code === 'P2025'
-    if (isNotFound) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2025'
+    ) {
       return NextResponse.json({ error: 'rating not found' }, { status: 404 })
     }
     throw err

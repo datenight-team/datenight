@@ -9,6 +9,7 @@ vi.mock('@/lib/db', () => ({
 }))
 vi.mock('@/lib/seerr', () => ({ deleteMedia: vi.fn() }))
 
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import * as seerr from '@/lib/seerr'
 import { POST as POST_RATING, PATCH as PATCH_RATING } from '@/app/api/ratings/route'
@@ -104,7 +105,10 @@ describe('PATCH /api/ratings', () => {
   })
 
   it('returns 404 when no prior rating exists', async () => {
-    const p2025 = Object.assign(new Error('Record not found'), { code: 'P2025' })
+    const p2025 = new Prisma.PrismaClientKnownRequestError('Record not found', {
+      code: 'P2025',
+      clientVersion: '7.0.0',
+    })
     vi.mocked(prisma.rating.update).mockRejectedValue(p2025)
 
     const req = new Request('http://localhost/api/ratings', {
