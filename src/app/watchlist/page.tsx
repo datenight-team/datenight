@@ -40,7 +40,6 @@ export default function WatchlistPage() {
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
     setMovies(sortByStatus(data))
-    setLoading(false)
   }, [])
 
   useEffect(() => {
@@ -55,7 +54,8 @@ export default function WatchlistPage() {
         setMovies(sortByStatus(moviesData))
         setUserNames(namesData)
       } catch (err: unknown) {
-        if (err instanceof Error && err.name !== 'AbortError') throw err
+        if (err instanceof Error && err.name === 'AbortError') return
+        throw err
       } finally {
         setLoading(false)
       }
