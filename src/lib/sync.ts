@@ -31,19 +31,21 @@ export async function runSync(): Promise<void> {
       orderBy: { sortOrder: 'asc' },
       take: TOP_N,
     })
-    for (const movie of toRequest) {
-      const result = await requestMovie(movie.tmdbId)
-      if (result) {
-        await prisma.movie.update({
-          where: { id: movie.id },
-          data: {
-            seerrRequestId: result.requestId,
-            seerrMediaId: null,
-            seerrStatus: 'pending',
-          },
-        })
-      }
-    }
+    await Promise.all(
+      toRequest.map(async (movie) => {
+        const result = await requestMovie(movie.tmdbId)
+        if (result) {
+          await prisma.movie.update({
+            where: { id: movie.id },
+            data: {
+              seerrRequestId: result.requestId,
+              seerrMediaId: null,
+              seerrStatus: 'pending',
+            },
+          })
+        }
+      })
+    )
   }
 
   // Update status for ALL watchlist movies that have been requested — no top-N
@@ -51,16 +53,18 @@ export async function runSync(): Promise<void> {
   const requested = await prisma.movie.findMany({
     where: { status: 'watchlist', seerrRequestId: { not: null } },
   })
-  for (const movie of requested) {
-    const { status, seerrMediaId } = await getMovieStatus(movie.tmdbId)
-    await prisma.movie.update({
-      where: { id: movie.id },
-      data: {
-        seerrStatus: status,
-        ...(seerrMediaId !== undefined ? { seerrMediaId: String(seerrMediaId) } : {}),
-      },
+  await Promise.all(
+    requested.map(async (movie) => {
+      const { status, seerrMediaId } = await getMovieStatus(movie.tmdbId)
+      await prisma.movie.update({
+        where: { id: movie.id },
+        data: {
+          seerrStatus: status,
+          ...(seerrMediaId !== undefined ? { seerrMediaId: String(seerrMediaId) } : {}),
+        },
+      })
     })
-  }
+  )
 
   const available = await prisma.movie.findMany({
     where: { status: 'watchlist', seerrStatus: 'available' },
