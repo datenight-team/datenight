@@ -24,8 +24,8 @@ const sizeConfig = {
   },
   lg: {
     container: 'relative w-full aspect-[2/3] bg-amber-100',
-    imgWidth: 0,
-    imgHeight: 0,
+    imgWidth: 0,  // unused — lg uses next/image fill mode, not explicit dimensions
+    imgHeight: 0, // unused — lg uses next/image fill mode, not explicit dimensions
     placeholder: 'text-amber-300 text-4xl',
     fill: true as const,
   },
