@@ -85,4 +85,27 @@ describe('MovieCard cleanup button', () => {
     fireEvent.click(screen.getByText(/failed/i))
     await waitFor(() => expect(screen.getByText(/cleaned up/i)).toBeInTheDocument())
   })
+
+  it('shows Edit button for a rated user', () => {
+    const movie = makeMovie({
+      ratings: [
+        { id: 1, movieId: 1, user: 'user1', rating: 'up', quote: 'Great film', submittedAt: new Date().toISOString() },
+        { id: 2, movieId: 1, user: 'user2', rating: 'down', quote: 'Not for me', submittedAt: new Date().toISOString() },
+      ],
+    })
+    render(<MovieCard movie={movie} userNames={userNames} />)
+    expect(screen.getAllByText('Edit')).toHaveLength(2)
+  })
+
+  it('opens edit dialog when Edit is clicked', async () => {
+    const movie = makeMovie({
+      ratings: [
+        { id: 1, movieId: 1, user: 'user1', rating: 'up', quote: 'Great film', submittedAt: new Date().toISOString() },
+        { id: 2, movieId: 1, user: 'user2', rating: 'down', quote: 'Not for me', submittedAt: new Date().toISOString() },
+      ],
+    })
+    render(<MovieCard movie={movie} userNames={userNames} />)
+    fireEvent.click(screen.getAllByText('Edit')[0])
+    await waitFor(() => expect(screen.getByText("Alice's verdict")).toBeInTheDocument())
+  })
 })

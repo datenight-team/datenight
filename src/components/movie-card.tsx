@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { ThumbRating } from './thumb-rating'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { EditRatingDialog } from './edit-rating-dialog'
 import type { Movie, Rating, User, RatingValue } from '@/types'
 
 type CleanupState = 'idle' | 'loading' | 'done' | 'error'
@@ -17,11 +16,7 @@ interface MovieCardProps {
 export function MovieCard({ movie, userNames }: MovieCardProps) {
   const [cleanupState, setCleanupState] = useState<CleanupState>('idle')
   const [localRatings, setLocalRatings] = useState<Rating[]>(movie.ratings ?? [])
-  const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [editRating, setEditRating] = useState<RatingValue | undefined>(undefined)
-  const [editQuote, setEditQuote] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [editDialogUser, setEditDialogUser] = useState<User | null>(null)
 
   const bothRated = localRatings.length === 2
   const agreed =
@@ -29,48 +24,9 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
     localRatings.find((r) => r.user === 'user1')?.rating ===
     localRatings.find((r) => r.user === 'user2')?.rating
 
-  const openEdit = (user: User) => {
-    const existing = localRatings.find((r) => r.user === user)
-    setEditingUser(user)
-    setEditRating(existing?.rating as RatingValue | undefined)
-    setEditQuote(existing?.quote ?? '')
-  }
-
-  const cancelEdit = () => {
-    setEditingUser(null)
-    setEditRating(undefined)
-    setEditQuote('')
-    setSaveError(null)
-  }
-
-  const saveEdit = async () => {
-    if (!editingUser || !editRating || !editQuote.trim()) return
-    setSaving(true)
-    setSaveError(null)
-    try {
-      const res = await fetch('/api/ratings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          movieId: movie.id,
-          user: editingUser,
-          rating: editRating,
-          quote: editQuote.trim(),
-        }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setLocalRatings(data.ratings)
-        cancelEdit()
-      } else {
-        setSaveError('Save failed — please try again.')
-      }
-    } catch {
-      setSaveError('Save failed — please try again.')
-    } finally {
-      setSaving(false)
-    }
-  }
+  const editingRating = editDialogUser
+    ? localRatings.find((r) => r.user === editDialogUser)
+    : null
 
   const handleCleanup = async () => {
     if (cleanupState === 'loading') return
@@ -87,41 +43,6 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
   const renderRatingRow = (user: User) => {
     const r = localRatings.find((rated) => rated.user === user)
     const hasRated = !!r
-
-    if (editingUser === user) {
-      return (
-        <div key={user} className="bg-amber-50 rounded-lg p-2 space-y-2">
-          <span className="text-xs font-semibold text-amber-900">{userNames[user]}</span>
-          <ThumbRating value={editRating} onChange={setEditRating} size="sm" />
-          <Textarea
-            value={editQuote}
-            onChange={(e) => setEditQuote(e.target.value)}
-            className="border-amber-300 focus:ring-amber-400 resize-none text-xs"
-            rows={2}
-          />
-          {saveError && <p className="text-xs text-red-600">{saveError}</p>}
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              className="flex-1 h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
-              onClick={saveEdit}
-              disabled={saving || !editRating || !editQuote.trim()}
-            >
-              {saving ? 'Saving…' : 'Save'}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex-1 h-6 text-xs border-stone-200 text-stone-500"
-              onClick={cancelEdit}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )
-    }
 
     if (!hasRated) {
       return (
@@ -143,7 +64,7 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
               <span className="text-xs text-green-600">✓</span>
             )}
             <button
-              onClick={() => openEdit(user)}
+              onClick={() => setEditDialogUser(user)}
               className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
             >
               Edit
@@ -231,6 +152,24 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
           </div>
         )}
       </div>
+
+      {/* Edit rating dialog — key forces fresh state when switching users */}
+      {editingRating && editDialogUser && (
+        <EditRatingDialog
+          key={editDialogUser}
+          movie={movie}
+          user={editDialogUser}
+          existingRating={editingRating.rating}
+          existingQuote={editingRating.quote}
+          open={true}
+          onClose={() => setEditDialogUser(null)}
+          onSaved={(updatedRatings) => {
+            setLocalRatings(updatedRatings)
+            setEditDialogUser(null)
+          }}
+          userNames={userNames}
+        />
+      )}
     </div>
   )
 }
