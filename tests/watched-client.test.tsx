@@ -102,3 +102,57 @@ describe('WatchedClient', () => {
     expect(screen.getByText('Sunrise')).toBeInTheDocument()
   })
 })
+
+// Additional movies for needs-review filter tests
+const bothRated = makeMovie(10, 'Both Rated', [
+  makeRating(10, 10, 'user1', 'up'),
+  makeRating(11, 10, 'user2', 'up'),
+])
+
+const onlyAliceRated = makeMovie(11, 'Only Alice Rated', [
+  makeRating(12, 11, 'user1', 'up'),
+])
+
+const onlyBobRated = makeMovie(12, 'Only Bob Rated', [
+  makeRating(13, 12, 'user2', 'down'),
+])
+
+const neitherRated = makeMovie(13, 'Neither Rated', [])
+
+const needsReviewMovies = [bothRated, onlyAliceRated, onlyBobRated, neitherRated]
+
+describe('WatchedClient needs-review filters', () => {
+  it('renders "Needs Alice" and "Needs Bob" buttons using userNames', () => {
+    render(<WatchedClient movies={needsReviewMovies} userNames={userNames} />)
+    expect(screen.getByRole('button', { name: /Needs Alice/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Needs Bob/i })).toBeInTheDocument()
+  })
+
+  it('"Needs Alice" shows movies where user1 has not rated', () => {
+    render(<WatchedClient movies={needsReviewMovies} userNames={userNames} />)
+    fireEvent.click(screen.getByRole('button', { name: /Needs Alice/i }))
+    expect(screen.queryByText('Both Rated')).not.toBeInTheDocument()
+    expect(screen.queryByText('Only Alice Rated')).not.toBeInTheDocument()
+    expect(screen.getByText('Only Bob Rated')).toBeInTheDocument()
+    expect(screen.getByText('Neither Rated')).toBeInTheDocument()
+  })
+
+  it('"Needs Bob" shows movies where user2 has not rated', () => {
+    render(<WatchedClient movies={needsReviewMovies} userNames={userNames} />)
+    fireEvent.click(screen.getByRole('button', { name: /Needs Bob/i }))
+    expect(screen.queryByText('Both Rated')).not.toBeInTheDocument()
+    expect(screen.queryByText('Only Bob Rated')).not.toBeInTheDocument()
+    expect(screen.getByText('Only Alice Rated')).toBeInTheDocument()
+    expect(screen.getByText('Neither Rated')).toBeInTheDocument()
+  })
+
+  it('"All" button clears a needs-review filter', () => {
+    render(<WatchedClient movies={needsReviewMovies} userNames={userNames} />)
+    fireEvent.click(screen.getByRole('button', { name: /Needs Alice/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^All$/i }))
+    expect(screen.getByText('Both Rated')).toBeInTheDocument()
+    expect(screen.getByText('Only Alice Rated')).toBeInTheDocument()
+    expect(screen.getByText('Only Bob Rated')).toBeInTheDocument()
+    expect(screen.getByText('Neither Rated')).toBeInTheDocument()
+  })
+})
