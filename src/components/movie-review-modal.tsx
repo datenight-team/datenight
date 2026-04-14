@@ -87,12 +87,14 @@ export function MovieReviewModal({
         <DialogFooter className="flex-row justify-between gap-2 sm:justify-between">
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={() => onEditUser('user1')}
               className="text-xs text-stone-400 hover:text-amber-600 transition-colors"
             >
               Edit {userNames.user1}&apos;s review
             </button>
             <button
+              type="button"
               onClick={() => onEditUser('user2')}
               className="text-xs text-stone-400 hover:text-amber-600 transition-colors"
             >
