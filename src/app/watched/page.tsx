@@ -13,11 +13,12 @@ export default async function WatchedPage() {
     include: { ratings: true },
   })
   const userNames = getUserNames()
+  const seerrUrl = process.env.NEXT_PUBLIC_SEERR_URL || null
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-amber-900 mb-6">Watched</h1>
-      <WatchedClient movies={movies as Movie[]} userNames={userNames} />
+      <WatchedClient movies={movies as Movie[]} userNames={userNames} seerrUrl={seerrUrl} />
     </div>
   )
 }

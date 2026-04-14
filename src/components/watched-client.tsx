@@ -9,9 +9,10 @@ type ActiveFilter = 'agreed' | 'disagreed' | 'needs_user1' | 'needs_user2'
 interface WatchedClientProps {
   movies: Movie[]
   userNames: Record<User, string>
+  seerrUrl?: string | null
 }
 
-export function WatchedClient({ movies, userNames }: WatchedClientProps) {
+export function WatchedClient({ movies, userNames, seerrUrl }: WatchedClientProps) {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<ActiveFilter | null>(null)
 
@@ -59,7 +60,7 @@ export function WatchedClient({ movies, userNames }: WatchedClientProps) {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {filteredMovies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} userNames={userNames} />
+            <MovieCard key={movie.id} movie={movie} userNames={userNames} seerrUrl={seerrUrl} />
           ))}
         </div>
       )}

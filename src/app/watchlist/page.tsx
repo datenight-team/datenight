@@ -34,6 +34,7 @@ export default function WatchlistPage() {
   const [loading, setLoading] = useState(true)
   const [ratingTarget, setRatingTarget] = useState<Movie | null>(null)
   const [userNames, setUserNames] = useState<Record<User, string>>({ user1: 'User 1', user2: 'User 2' })
+  const [seerrUrl, setSeerrUrl] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [activeStatus, setActiveStatus] = useState<SeerrStatus | null>(null)
 
@@ -47,12 +48,14 @@ export default function WatchlistPage() {
 
     const load = async () => {
       try {
-        const [moviesData, namesData] = await Promise.all([
+        const [moviesData, namesData, configData] = await Promise.all([
           fetch('/api/movies', { signal: controller.signal }).then((r) => r.json()),
           fetch('/api/user-names', { signal: controller.signal }).then((r) => r.json()),
+          fetch('/api/config', { signal: controller.signal }).then((r) => r.json()),
         ])
         setMovies(sortByStatus(moviesData))
         setUserNames(namesData)
+        setSeerrUrl(configData.seerrUrl ?? null)
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') return
         throw err
@@ -131,6 +134,7 @@ export default function WatchlistPage() {
                 key={movie.id}
                 movie={movie}
                 position={index + 1}
+                seerrUrl={seerrUrl}
                 onMarkWatched={setRatingTarget}
                 onForceDownload={handleForceDownload}
                 onRemove={handleRemove}

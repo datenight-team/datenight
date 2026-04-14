@@ -11,9 +11,10 @@ type CleanupState = 'idle' | 'loading' | 'done' | 'error'
 interface MovieCardProps {
   movie: Movie
   userNames: Record<User, string>
+  seerrUrl?: string | null
 }
 
-export function MovieCard({ movie, userNames }: MovieCardProps) {
+export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
   const [cleanupState, setCleanupState] = useState<CleanupState>('idle')
   const [localRatings, setLocalRatings] = useState<Rating[]>(movie.ratings ?? [])
   const [editDialogUser, setEditDialogUser] = useState<User | null>(null)
@@ -87,9 +88,9 @@ export function MovieCard({ movie, userNames }: MovieCardProps) {
       <div className="p-3">
         <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">
           {movie.title}
-          {process.env.NEXT_PUBLIC_SEERR_URL && (
+          {seerrUrl && (
             <a
-              href={`${process.env.NEXT_PUBLIC_SEERR_URL}/movie/${movie.tmdbId}`}
+              href={`${seerrUrl}/movie/${movie.tmdbId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-normal text-xs"

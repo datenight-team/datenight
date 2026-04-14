@@ -11,10 +11,7 @@
 
 services:
   datenight:
-    build:
-      context: .
-      args:
-        - NEXT_PUBLIC_SEERR_URL=${NEXT_PUBLIC_SEERR_URL:-}
+    build: .
     container_name: datenight
     image: datenight:latest
     mem_limit: 512m
@@ -28,6 +25,7 @@ services:
       - DATABASE_URL=file:/app/data/datenight.db
       - TMDB_API_KEY=${TMDB_API_KEY}
       - SEERR_URL=${SEERR_URL}
+      - NEXT_PUBLIC_SEERR_URL=${NEXT_PUBLIC_SEERR_URL:-}
       - SEERR_API_KEY=${SEERR_API_KEY}
       - SEERR_CONCURRENCY=${SEERR_CONCURRENCY:-}
       - PLEX_URL=${PLEX_URL}

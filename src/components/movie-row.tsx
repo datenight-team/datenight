@@ -16,6 +16,7 @@ import { formatRuntime } from "@/lib/utils";
 interface MovieRowProps {
   movie: Movie;
   position: number;
+  seerrUrl?: string | null;
   onMarkWatched: (movie: Movie) => void;
   onForceDownload: (movieId: number) => void;
   onRemove: (movieId: number, opts: { seerr: boolean }) => void;
@@ -24,6 +25,7 @@ interface MovieRowProps {
 export function MovieRow({
   movie,
   position,
+  seerrUrl,
   onMarkWatched,
   onForceDownload,
   onRemove,
@@ -60,9 +62,9 @@ export function MovieRow({
             <span>
               {movie.year} · {formatRuntime(movie.runtime)}
             </span>
-            {process.env.NEXT_PUBLIC_SEERR_URL && (
+            {seerrUrl && (
               <a
-                href={`${process.env.NEXT_PUBLIC_SEERR_URL}/movie/${movie.tmdbId}`}
+                href={`${seerrUrl}/movie/${movie.tmdbId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-amber-500 hover:text-amber-700 transition-colors"

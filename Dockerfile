@@ -10,8 +10,6 @@ RUN npm ci
 
 FROM base AS builder
 ENV DATABASE_URL=file:/tmp/build.db
-ARG NEXT_PUBLIC_SEERR_URL
-ENV NEXT_PUBLIC_SEERR_URL=$NEXT_PUBLIC_SEERR_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN mkdir -p public
