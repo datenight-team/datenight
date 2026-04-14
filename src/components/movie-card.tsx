@@ -167,6 +167,10 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
             setLocalRatings(updatedRatings)
             setEditDialogUser(null)
           }}
+          onDeleted={() => {
+            setLocalRatings((prev) => prev.filter((r) => r.user !== editDialogUser))
+            setEditDialogUser(null)
+          }}
           userNames={userNames}
         />
       )}

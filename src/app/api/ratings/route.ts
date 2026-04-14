@@ -67,3 +67,23 @@ export async function PATCH(req: Request) {
   const ratings = await prisma.rating.findMany({ where: { movieId } })
   return NextResponse.json({ ratings }, { status: 200 })
 }
+
+export async function DELETE(req: Request) {
+  const body = await req.json().catch(() => ({}))
+  const { movieId, user } = body as { movieId?: number; user?: User }
+
+  if (!movieId || !USER_KEYS.includes(user as User)) {
+    return NextResponse.json({ error: 'invalid request' }, { status: 422 })
+  }
+
+  const deleted = await prisma.rating.deleteMany({
+    where: { movieId, user: user as User },
+  })
+
+  if (deleted.count === 0) {
+    return NextResponse.json({ error: 'rating not found' }, { status: 404 })
+  }
+
+  const ratings = await prisma.rating.findMany({ where: { movieId } })
+  return NextResponse.json({ ratings }, { status: 200 })
+}

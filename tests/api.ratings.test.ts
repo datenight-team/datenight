@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    rating: { create: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+    rating: { create: vi.fn(), findMany: vi.fn(), update: vi.fn(), deleteMany: vi.fn() },
     movie: { findUnique: vi.fn(), update: vi.fn() },
   },
 }))
@@ -12,7 +12,7 @@ vi.mock('@/lib/seerr', () => ({ deleteMedia: vi.fn() }))
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import * as seerr from '@/lib/seerr'
-import { POST as POST_RATING, PATCH as PATCH_RATING } from '@/app/api/ratings/route'
+import { POST as POST_RATING, PATCH as PATCH_RATING, DELETE as DELETE_RATING } from '@/app/api/ratings/route'
 import { POST as POST_WATCHED } from '@/app/api/movies/[id]/watched/route'
 
 const movie = {
@@ -141,6 +141,51 @@ describe('PATCH /api/ratings', () => {
       body: JSON.stringify({ movieId: 1, user: 'user1', rating: 'up', quote: '  ' }),
     })
     expect((await PATCH_RATING(req)).status).toBe(422)
+  })
+})
+
+describe('DELETE /api/ratings', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns 422 when movieId is missing', async () => {
+    const req = new Request('http://localhost/api/ratings', {
+      method: 'DELETE',
+      body: JSON.stringify({ user: 'user1' }),
+    })
+    expect((await DELETE_RATING(req)).status).toBe(422)
+  })
+
+  it('returns 422 when user is invalid', async () => {
+    const req = new Request('http://localhost/api/ratings', {
+      method: 'DELETE',
+      body: JSON.stringify({ movieId: 42, user: 'baduser' }),
+    })
+    expect((await DELETE_RATING(req)).status).toBe(422)
+  })
+
+  it('returns 404 when rating does not exist', async () => {
+    vi.mocked(prisma.rating.deleteMany).mockResolvedValue({ count: 0 })
+    const req = new Request('http://localhost/api/ratings', {
+      method: 'DELETE',
+      body: JSON.stringify({ movieId: 42, user: 'user1' }),
+    })
+    expect((await DELETE_RATING(req)).status).toBe(404)
+  })
+
+  it('deletes rating and returns remaining ratings', async () => {
+    vi.mocked(prisma.rating.deleteMany).mockResolvedValue({ count: 1 })
+    vi.mocked(prisma.rating.findMany).mockResolvedValue([])
+    const req = new Request('http://localhost/api/ratings', {
+      method: 'DELETE',
+      body: JSON.stringify({ movieId: 42, user: 'user1' }),
+    })
+    const res = await DELETE_RATING(req)
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data.ratings).toEqual([])
+    expect(prisma.rating.deleteMany).toHaveBeenCalledWith({
+      where: { movieId: 42, user: 'user1' },
+    })
   })
 })
 
