@@ -15,8 +15,8 @@ import type { Movie, User, Rating, RatingValue } from '@/types'
 interface EditRatingDialogProps {
   movie: Movie
   user: User
-  existingRating: RatingValue
-  existingQuote: string
+  existingRating?: RatingValue
+  existingQuote?: string
   open: boolean
   onClose: () => void
   onSaved: (updatedRatings: Rating[]) => void
@@ -27,13 +27,13 @@ export function EditRatingDialog({
   movie,
   user,
   existingRating,
-  existingQuote,
+  existingQuote = '',
   open,
   onClose,
   onSaved,
   userNames,
 }: EditRatingDialogProps) {
-  const [rating, setRating] = useState<RatingValue>(existingRating)
+  const [rating, setRating] = useState<RatingValue | undefined>(existingRating)
   const [quote, setQuote] = useState(existingQuote)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,9 +42,10 @@ export function EditRatingDialog({
     if (!rating || !quote.trim()) return
     setSaving(true)
     setError(null)
+    const isNew = !existingRating
     try {
       const res = await fetch('/api/ratings', {
-        method: 'PATCH',
+        method: isNew ? 'POST' : 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ movieId: movie.id, user, rating, quote: quote.trim() }),
       })
@@ -89,7 +90,7 @@ export function EditRatingDialog({
             onClick={handleSave}
             disabled={saving || !rating || !quote.trim()}
           >
-            {saving ? 'Saving…' : 'Save Changes'}
+            {saving ? 'Saving…' : existingRating ? 'Save Changes' : 'Submit'}
           </Button>
           <Button
             variant="outline"
