@@ -19,6 +19,11 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
     <td align="center"><a href="datenight-add-movie.png"><img src="datenight-add-movie.png" width="260" alt="Add Movie"/></a><br/><sub>Add Movie</sub></td>
     <td align="center"><a href="datenight-recommendations.png"><img src="datenight-recommendations.png" width="260" alt="Recommendations"/></a><br/><sub>Recommendations</sub></td>
   </tr>
+  <tr>
+    <td align="center"><a href="datenight-watched.png"><img src="datenight-watched.png" width="260" alt="Watched"/></a><br/><sub>Watched</sub></td>
+    <td align="center"><a href="datenight-watched-detail.png"><img src="datenight-watched-detail.png" width="260" alt="Review Detail"/></a><br/><sub>Review Detail</sub></td>
+    <td></td>
+  </tr>
 </table>
 
 ## Features
