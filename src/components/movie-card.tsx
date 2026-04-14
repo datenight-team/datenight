@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ThumbRating } from './thumb-rating'
 import { MoviePoster } from './movie-poster'
 import { EditRatingDialog } from './edit-rating-dialog'
+import { MovieReviewModal } from './movie-review-modal'
 import type { Movie, Rating, User, RatingValue } from '@/types'
 
 type CleanupState = 'idle' | 'loading' | 'done' | 'error'
@@ -18,6 +19,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
   const [cleanupState, setCleanupState] = useState<CleanupState>('idle')
   const [localRatings, setLocalRatings] = useState<Rating[]>(movie.ratings ?? [])
   const [editDialogUser, setEditDialogUser] = useState<User | null>(null)
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
 
   const bothRated = localRatings.length === 2
   const agreed =
@@ -29,7 +31,8 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
     ? localRatings.find((r) => r.user === editDialogUser)
     : null
 
-  const handleCleanup = async () => {
+  const handleCleanup = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (cleanupState === 'loading') return
     setCleanupState('loading')
     try {
@@ -50,7 +53,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
         <div key={user} className="bg-stone-50 rounded-lg p-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-stone-400">{userNames[user]}</span>
           <button
-            onClick={() => setEditDialogUser(user)}
+            onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
             className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
           >
             Add Review
@@ -70,7 +73,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
               <span className="text-xs text-green-600">✓</span>
             )}
             <button
-              onClick={() => setEditDialogUser(user)}
+              onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
               className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
             >
               Edit
@@ -86,43 +89,54 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
 
   return (
     <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-sm">
-      {/* Poster */}
-      <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="lg" />
+      {/* Clickable poster + header area */}
+      <button
+        className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+        onClick={() => setReviewModalOpen(true)}
+        aria-label={`View reviews for ${movie.title}`}
+      >
+        <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="lg" />
 
-      {/* Info */}
-      <div className="p-3">
-        <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">
-          {movie.title}
-          {seerrUrl && (
-            <a
-              href={`${seerrUrl}/movie/${movie.tmdbId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-normal text-xs"
-              title="View in Seerr"
-            >
-              ↗
-            </a>
-          )}
-        </h3>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-stone-400 text-xs">{movie.year}</p>
-          {bothRated && (
-            <span className="text-xs text-stone-400" title={agreed ? 'You agreed' : 'You disagreed'}>
-              {agreed ? '🤝' : '⚔️'}
-            </span>
+        <div className="px-3 pt-3 pb-1">
+          <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">
+            {movie.title}
+            {seerrUrl && (
+              <a
+                href={`${seerrUrl}/movie/${movie.tmdbId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-normal text-xs"
+                title="View in Seerr"
+              >
+                ↗
+              </a>
+            )}
+          </h3>
+          <div className="flex items-center justify-between">
+            <p className="text-stone-400 text-xs">{movie.year}</p>
+            {bothRated && (
+              <span className="text-xs text-stone-400" title={agreed ? 'You agreed' : 'You disagreed'}>
+                {agreed ? '🤝' : '⚔️'}
+              </span>
+            )}
+          </div>
+        </div>
+      </button>
+
+      {/* Rating rows (non-clickable area for the modal trigger) */}
+      <div className="px-3 pb-3">
+        <div className="mt-2">
+          {localRatings.length === 0 ? (
+            <p className="text-xs text-stone-400 italic text-center py-2">
+              Waiting for both ratings…
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {(['user1', 'user2'] as User[]).map((user) => renderRatingRow(user))}
+            </div>
           )}
         </div>
-
-        {localRatings.length === 0 ? (
-          <p className="text-xs text-stone-400 italic text-center py-2">
-            Waiting for both ratings…
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {(['user1', 'user2'] as User[]).map((user) => renderRatingRow(user))}
-          </div>
-        )}
 
         {/* Cleanup button — only shown when movie has a Seerr entry */}
         {movie.seerrMediaId && (
@@ -152,6 +166,19 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
           </div>
         )}
       </div>
+
+      {/* Review modal */}
+      <MovieReviewModal
+        movie={movie}
+        ratings={localRatings}
+        userNames={userNames}
+        open={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onEditUser={(user) => {
+          setReviewModalOpen(false)
+          setEditDialogUser(user)
+        }}
+      />
 
       {/* Edit/add rating dialog — key forces fresh state when switching users */}
       {editDialogUser && (
