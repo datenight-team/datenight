@@ -49,7 +49,12 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
       return (
         <div key={user} className="bg-stone-50 rounded-lg p-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-stone-400">{userNames[user]}</span>
-          <span className="text-xs text-stone-300">—</span>
+          <button
+            onClick={() => setEditDialogUser(user)}
+            className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
+          >
+            Add Review
+          </button>
         </div>
       )
     }
@@ -148,14 +153,14 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
         )}
       </div>
 
-      {/* Edit rating dialog — key forces fresh state when switching users */}
-      {editingRating && editDialogUser && (
+      {/* Edit/add rating dialog — key forces fresh state when switching users */}
+      {editDialogUser && (
         <EditRatingDialog
           key={editDialogUser}
           movie={movie}
           user={editDialogUser}
-          existingRating={editingRating.rating}
-          existingQuote={editingRating.quote}
+          existingRating={editingRating?.rating as RatingValue | undefined}
+          existingQuote={editingRating?.quote}
           open={true}
           onClose={() => setEditDialogUser(null)}
           onSaved={(updatedRatings) => {
