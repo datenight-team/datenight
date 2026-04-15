@@ -7,9 +7,28 @@
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
 [![Powered by Claude](https://img.shields.io/badge/Powered%20by-Claude%20Opus-D97757?logo=anthropic&logoColor=white)](https://anthropic.com)
 
-A home-lab web app for two people to manage their [Criterion Collection](https://www.criterion.com) date night movie watchlist.
+A little app for a couple to use to manage their date night movie watching.
 
-Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Criterion URL, drag to set the watch order, and the app automatically queues downloads via Seerr and keeps a "Date Night" Plex collection in sync.
+Date night movies have always been a thing here but managing watch lists has
+been something we've done on a spreadsheet. We thought it'd be fun to modernize
+the experience a bit. The interface is purposely simple. It's focused on making
+it easy to add movies and manage what to watch. That's it.
+
+The app lets anyone add movies to the watch list by simply pasting an IMDB or
+Criterion link. Once it's on the list, you can manage the availability of the
+film for watching. The app will automatically keep a collection in sync for you
+as things arrive.
+
+The fun starts _after_ you've watched a movie together. Marking a movie watched
+gives you both an opportunity to rate the movie and leave a little review.
+Ratings are thumps up/down, Siskel-and-Ebert style. The app won't show you the
+other partner's rating on a movie until you've both entered your rating. No
+influencing each other's opinions!
+
+There's a recommendation interface as well. You give it a Claude API key and it
+uses your watch history to recommend films based on things you've both agreed
+on. It recommends to things it thinks you'll both agree on based on your
+history and a third, wildcard recommendation to expand your horizons.
 
 ## Screenshots
 
@@ -28,32 +47,18 @@ Runs in Docker alongside their *arr stack. Add movies by pasting an IMDB or Crit
 
 ## Features
 
-- **Add movies** by pasting an IMDB or Criterion Collection URL — metadata pulled from TMDB automatically
-- **Drag to reorder** the watchlist (dnd-kit sortable)
-- **Seerr integration** — top 10 unwatched movies are automatically requested for download; status shown per movie (Queued / Downloading / Ready)
+- **Add movies** by pasting an IMDB or Criterion Collection URL — metadata pulled from TMDB automatically. Simple and easy for anyone to understand and use.
 - **Plex integration** — a "Date Night" collection is kept in sync with available movies in watch order; a **Sync Plex** button in the sidebar triggers an on-demand update
+- **Seerr integration** — for managing movie availability and handling clean up post-watch
 - **Blind ratings** — each person gives a thumbs up or down and writes a critic's quote independently (Siskel & Ebert style); results are revealed only after both have rated, with 🤝 if you agreed and ⚔️ if you didn't
 - **Recommendations** — Claude Opus analyzes your agreed-upon films and recommends 2 consensus picks (films you'll both likely 👍) and 1 wild card (a deliberate push outside your comfort zone); optional Criterion-only filter
 - **Ask Claude** — sidebar link opens Claude with a pre-filled prompt based on recently watched films
-- **Warm amber theme** — cozy UI, not a media server dashboard
-
-## Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS + shadcn/ui |
-| Drag & drop | dnd-kit |
-| Database | SQLite via Prisma ORM |
-| Background jobs | node-cron (inside the Next.js server process) |
-| Runtime | tsx (TypeScript execution) |
-| Tests | Vitest + Testing Library |
-| Container | Docker (single Alpine image) |
 
 ## Configuration
 
-All secrets are passed as environment variables. `make setup` creates `.env.local` from `.env.example` automatically. Edit it to fill in your API keys before starting the app.
+All secrets are passed as environment variables. `make setup` creates
+`.env.local` from `.env.example` automatically. Edit it to fill in your API
+keys before starting the app. Use `.env` for the production secret delivery.
 
 | Variable | Description |
 |---|---|
@@ -120,28 +125,6 @@ make check      # tests + lint + typecheck together
 
 ```bash
 make help       # full list of available commands
-```
-
-## Project Structure
-
-```
-src/
-  app/
-    api/              # Next.js API routes
-    watchlist/        # Draggable watch list page
-    watched/          # Grid of watched + reviewed movies
-    add/              # URL paste → preview → add flow
-    recommendations/  # Claude-powered film recommendations
-  components/         # Shared UI components
-  lib/                # Server-side clients (TMDB, Seerr, Plex, Claude, sync)
-  types/              # Shared TypeScript interfaces
-prisma/
-  schema.prisma       # Movie, Rating, Setting models
-  migrations/         # SQLite migrations
-scripts/
-  import-csv.ts       # Bulk import from CSV / Google Sheets export
-tests/                # Vitest test files
-server.ts             # Custom Next.js server (starts sync job in production)
 ```
 
 ## Troubleshooting
