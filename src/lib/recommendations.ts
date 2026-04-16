@@ -1,5 +1,6 @@
 // src/lib/recommendations.ts
-import { anthropic } from './claude'
+import { getAnthropic } from './claude'
+import { getConfig } from './config'
 import { searchByTitle } from './tmdb'
 import { prisma } from './db'
 import { getUserNames } from './users'
@@ -62,11 +63,12 @@ Always respond with valid JSON only. No text before or after the JSON.`
 export async function getRecommendations(
   criterionOnly: boolean
 ): Promise<RecommendationsResult> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is not configured')
+  const config = await getConfig()
+  if (!config.anthropicApiKey) {
+    throw new Error('Anthropic API key is not configured')
   }
 
-  const userNames = getUserNames()
+  const userNames = await getUserNames()
 
   // Fetch all movies with their ratings from the DB
   const allMovies = await prisma.movie.findMany({
@@ -157,6 +159,7 @@ Recommend exactly 3 films — 2 consensus picks then 1 wildcard. Return this exa
 }`
 
   // Call Claude — Opus 4.6 with adaptive thinking for genuine taste reasoning
+  const anthropic = await getAnthropic()
   const stream = anthropic.messages.stream({
     model: 'claude-opus-4-6',
     max_tokens: 4096,
