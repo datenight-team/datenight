@@ -8,7 +8,7 @@ This is a personal home-lab project. Only the latest version on `main` receives 
 
 Please **do not** open a public GitHub issue for security vulnerabilities.
 
-Instead, use [GitHub's private vulnerability reporting](https://github.com/ianchesal/datenight/security/advisories/new) to submit a report. If you're unsure whether something qualifies, err on the side of reporting privately.
+Instead, use [GitHub's private vulnerability reporting](https://github.com/datenight-team/datenight/security/advisories/new) to submit a report. If you're unsure whether something qualifies, err on the side of reporting privately.
 
 Include as much of the following as you can:
 
