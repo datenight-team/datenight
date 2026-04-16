@@ -1,20 +1,21 @@
 // src/lib/sync.ts
 import { prisma } from './db'
+import { getConfig } from './config'
 import { getMovieStatus, requestMovie } from './seerr'
 import { syncDateNightCollection } from './plex'
 
 const TOP_N = 10
 
-function getConcurrencyLimit(): number | null {
-  const raw = process.env.SEERR_CONCURRENCY
-  if (raw === undefined || raw === '') return null
-  return parseInt(raw, 10)
+async function getConcurrencyLimit(): Promise<number | null> {
+  const { seerrConcurrency } = await getConfig()
+  if (!seerrConcurrency) return null
+  return parseInt(seerrConcurrency, 10)
 }
 
 async function isRequestingAllowed(): Promise<boolean> {
-  const limit = getConcurrencyLimit()
-  if (limit === null) return true   // no limit set — original behaviour
-  if (limit === 0) return false     // disabled
+  const limit = await getConcurrencyLimit()
+  if (limit === null) return true
+  if (limit === 0) return false
   const active = await prisma.movie.count({
     where: { seerrStatus: { in: ['pending', 'processing'] } },
   })
@@ -24,7 +25,6 @@ async function isRequestingAllowed(): Promise<boolean> {
 export async function runSync(): Promise<void> {
   const canRequest = await isRequestingAllowed()
 
-  // Auto-request the top N unwatched movies that haven't been requested yet
   if (canRequest) {
     const toRequest = await prisma.movie.findMany({
       where: { status: 'watchlist', seerrRequestId: null },
@@ -48,8 +48,6 @@ export async function runSync(): Promise<void> {
     )
   }
 
-  // Update status for ALL watchlist movies that have been requested — no top-N
-  // limit here so movies outside the top 10 still get their status refreshed.
   const requested = await prisma.movie.findMany({
     where: { status: 'watchlist', seerrRequestId: { not: null } },
   })

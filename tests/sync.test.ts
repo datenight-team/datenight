@@ -13,11 +13,22 @@ vi.mock('@/lib/seerr', () => ({
 vi.mock('@/lib/plex', () => ({
   syncDateNightCollection: vi.fn(),
 }))
+vi.mock('@/lib/config', () => ({
+  getConfig: vi.fn(),
+}))
 
 import { prisma } from '@/lib/db'
 import * as seerr from '@/lib/seerr'
 import * as plex from '@/lib/plex'
+import { getConfig } from '@/lib/config'
 import { runSync } from '@/lib/sync'
+
+const mockConfig = {
+  seerrConcurrency: '',
+  user1Name: 'User 1', user2Name: 'User 2',
+  tmdbApiKey: '', seerrUrl: '', seerrPublicUrl: '', seerrApiKey: '',
+  plexUrl: '', plexToken: '', anthropicApiKey: '',
+}
 
 const baseMovie = {
   id: 1,
@@ -35,6 +46,7 @@ describe('runSync', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(prisma.movie.count).mockResolvedValue(0)
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('requests top-10 movies not yet in Seerr', async () => {
@@ -79,7 +91,7 @@ describe('runSync', () => {
   })
 
   it('skips requestMovie when SEERR_CONCURRENCY is 0', async () => {
-    vi.stubEnv('SEERR_CONCURRENCY', '0')
+    vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, seerrConcurrency: '0' })
     // canRequest=false → toRequest query is skipped; only requested + available
     vi.mocked(prisma.movie.findMany)
       .mockResolvedValueOnce([])  // requested
@@ -89,11 +101,10 @@ describe('runSync', () => {
     await runSync()
 
     expect(seerr.requestMovie).not.toHaveBeenCalled()
-    vi.unstubAllEnvs()
   })
 
   it('skips requestMovie when active downloads are at the concurrency limit', async () => {
-    vi.stubEnv('SEERR_CONCURRENCY', '2')
+    vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, seerrConcurrency: '2' })
     vi.mocked(prisma.movie.count).mockResolvedValue(2)
     // canRequest=false → toRequest query is skipped; only requested + available
     vi.mocked(prisma.movie.findMany)
@@ -104,11 +115,10 @@ describe('runSync', () => {
     await runSync()
 
     expect(seerr.requestMovie).not.toHaveBeenCalled()
-    vi.unstubAllEnvs()
   })
 
   it('allows requestMovie when active downloads are under the concurrency limit', async () => {
-    vi.stubEnv('SEERR_CONCURRENCY', '2')
+    vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, seerrConcurrency: '2' })
     vi.mocked(prisma.movie.count).mockResolvedValue(1)
     // call order: toRequest, requested, available
     vi.mocked(prisma.movie.findMany)
@@ -121,7 +131,6 @@ describe('runSync', () => {
     await runSync()
 
     expect(seerr.requestMovie).toHaveBeenCalledWith(345911)
-    vi.unstubAllEnvs()
   })
 
   it('syncs Plex collection with available movies in sort order', async () => {
