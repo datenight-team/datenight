@@ -4,13 +4,25 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
+vi.mock('@/lib/config', () => ({
+  getConfig: vi.fn(),
+}))
+
+import { getConfig } from '@/lib/config'
 const { getMovieStatus, requestMovie, deleteMedia } = await import('@/lib/seerr')
+
+const mockConfig = {
+  seerrUrl: 'http://seerr:5055',
+  seerrApiKey: 'test-key',
+  user1Name: 'User 1', user2Name: 'User 2',
+  tmdbApiKey: '', seerrPublicUrl: '', seerrConcurrency: '',
+  plexUrl: '', plexToken: '', anthropicApiKey: '',
+}
 
 describe('getMovieStatus', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.SEERR_URL = 'http://seerr:5055'
-    process.env.SEERR_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('returns available when Seerr status is 5', async () => {
@@ -58,8 +70,7 @@ describe('getMovieStatus', () => {
 describe('requestMovie', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.SEERR_URL = 'http://seerr:5055'
-    process.env.SEERR_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('returns requestId on success', async () => {
@@ -76,8 +87,7 @@ describe('requestMovie', () => {
 describe('deleteMedia', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.SEERR_URL = 'http://seerr:5055'
-    process.env.SEERR_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('returns true on success', async () => {

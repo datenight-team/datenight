@@ -1,8 +1,6 @@
 // src/lib/seerr.ts
 import type { SeerrStatus } from '@/types'
-
-function base() { return process.env.SEERR_URL }
-function key() { return process.env.SEERR_API_KEY ?? '' }
+import { getConfig } from './config'
 
 function mapStatus(code: number | undefined): SeerrStatus {
   if (code === 5) return 'available'
@@ -17,8 +15,9 @@ export async function getMovieStatus(tmdbId: number): Promise<{
   seerrRequestId?: number
 }> {
   try {
-    const res = await fetch(`${base()}/api/v1/movie/${tmdbId}`, {
-      headers: { 'X-Api-Key': key() },
+    const { seerrUrl, seerrApiKey } = await getConfig()
+    const res = await fetch(`${seerrUrl}/api/v1/movie/${tmdbId}`, {
+      headers: { 'X-Api-Key': seerrApiKey },
     })
     if (!res.ok) return { status: 'not_requested' }
     const data = await res.json()
@@ -37,9 +36,10 @@ export async function requestMovie(
   tmdbId: number
 ): Promise<{ requestId: string } | null> {
   try {
-    const res = await fetch(`${base()}/api/v1/request`, {
+    const { seerrUrl, seerrApiKey } = await getConfig()
+    const res = await fetch(`${seerrUrl}/api/v1/request`, {
       method: 'POST',
-      headers: { 'X-Api-Key': key(), 'Content-Type': 'application/json' },
+      headers: { 'X-Api-Key': seerrApiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ mediaType: 'movie', mediaId: tmdbId }),
     })
     if (!res.ok) return null
@@ -52,9 +52,10 @@ export async function requestMovie(
 
 export async function deleteMedia(seerrMediaId: number): Promise<boolean> {
   try {
-    const res = await fetch(`${base()}/api/v1/media/${seerrMediaId}`, {
+    const { seerrUrl, seerrApiKey } = await getConfig()
+    const res = await fetch(`${seerrUrl}/api/v1/media/${seerrMediaId}`, {
       method: 'DELETE',
-      headers: { 'X-Api-Key': key() },
+      headers: { 'X-Api-Key': seerrApiKey },
     })
     return res.ok
   } catch {
@@ -64,8 +65,9 @@ export async function deleteMedia(seerrMediaId: number): Promise<boolean> {
 
 export async function deleteFromService(tmdbId: number): Promise<boolean> {
   try {
-    const res = await fetch(`${base()}/api/v1/movie/${tmdbId}`, {
-      headers: { 'X-Api-Key': key() },
+    const { seerrUrl, seerrApiKey } = await getConfig()
+    const res = await fetch(`${seerrUrl}/api/v1/movie/${tmdbId}`, {
+      headers: { 'X-Api-Key': seerrApiKey },
     })
     if (!res.ok) return false
     const data = await res.json()
@@ -74,8 +76,8 @@ export async function deleteFromService(tmdbId: number): Promise<boolean> {
     if (media.externalServiceId === null || media.externalServiceId === undefined) return false
 
     const delRes = await fetch(
-      `${base()}/api/v1/service/radarr/${media.serviceId}/movie/${media.externalServiceId}`,
-      { method: 'DELETE', headers: { 'X-Api-Key': key() } }
+      `${seerrUrl}/api/v1/service/radarr/${media.serviceId}/movie/${media.externalServiceId}`,
+      { method: 'DELETE', headers: { 'X-Api-Key': seerrApiKey } }
     )
     return delRes.ok
   } catch {
