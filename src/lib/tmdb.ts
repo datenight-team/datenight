@@ -1,15 +1,16 @@
 // src/lib/tmdb.ts
 import type { TmdbMovieDetails } from '@/types'
+import { getConfig } from './config'
 
 const BASE = 'https://api.themoviedb.org/3'
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500'
 
-function apiKey() {
-  return process.env.TMDB_API_KEY ?? ''
+async function apiKey(): Promise<string> {
+  return (await getConfig()).tmdbApiKey
 }
 
 async function fetchDetails(tmdbId: number): Promise<TmdbMovieDetails | null> {
-  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${apiKey()}`)
+  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${await apiKey()}`)
   if (!res.ok) return null
   const m = await res.json()
   return {
@@ -27,7 +28,7 @@ export async function findByImdbId(
   imdbId: string
 ): Promise<TmdbMovieDetails | null> {
   const res = await fetch(
-    `${BASE}/find/${imdbId}?api_key=${apiKey()}&external_source=imdb_id`
+    `${BASE}/find/${imdbId}?api_key=${await apiKey()}&external_source=imdb_id`
   )
   if (!res.ok) return null
   const data = await res.json()
@@ -42,7 +43,7 @@ export async function searchByTitle(
 ): Promise<TmdbMovieDetails | null> {
   const yearParam = year ? `&year=${year}` : ''
   const res = await fetch(
-    `${BASE}/search/movie?api_key=${apiKey()}&query=${encodeURIComponent(title)}${yearParam}`
+    `${BASE}/search/movie?api_key=${await apiKey()}&query=${encodeURIComponent(title)}${yearParam}`
   )
   if (!res.ok) return null
   const data = await res.json()
@@ -54,9 +55,6 @@ export async function searchByTitle(
 export async function lookupCriterionSlug(
   slug: string
 ): Promise<TmdbMovieDetails | null> {
-  // Try scraping the Criterion page for the canonical title first.
-  // This is blocked by Cloudflare in many server environments, so we
-  // fall back to deriving the title from the slug.
   try {
     const res = await fetch(`https://www.criterion.com/films/${slug}`)
     if (res.ok) {
@@ -72,8 +70,6 @@ export async function lookupCriterionSlug(
     // fall through
   }
 
-  // Fallback: derive title from slug. Format is "{numeric-id}-{title-with-dashes}"
-  // e.g. "27910-3-10-to-yuma" → "3 10 to yuma"
   const titleSlug = slug.replace(/^\d+-/, '')
   const title = titleSlug.replace(/-/g, ' ')
   return searchByTitle(title)
