@@ -64,6 +64,15 @@ export function Sidebar() {
         </a>
         <PlexSyncButton />
         <AskClaudeLink />
+        <Link
+          href="/settings"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors',
+            pathname === '/settings' && 'bg-amber-100 font-semibold'
+          )}
+        >
+          ⚙️ Settings
+        </Link>
       </div>
     </aside>
   )

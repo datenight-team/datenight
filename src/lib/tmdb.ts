@@ -1,15 +1,12 @@
 // src/lib/tmdb.ts
 import type { TmdbMovieDetails } from '@/types'
+import { getConfig } from './config'
 
 const BASE = 'https://api.themoviedb.org/3'
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500'
 
-function apiKey() {
-  return process.env.TMDB_API_KEY ?? ''
-}
-
-async function fetchDetails(tmdbId: number): Promise<TmdbMovieDetails | null> {
-  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${apiKey()}`)
+async function fetchDetails(tmdbId: number, key: string): Promise<TmdbMovieDetails | null> {
+  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${key}`)
   if (!res.ok) return null
   const m = await res.json()
   return {
@@ -26,37 +23,37 @@ async function fetchDetails(tmdbId: number): Promise<TmdbMovieDetails | null> {
 export async function findByImdbId(
   imdbId: string
 ): Promise<TmdbMovieDetails | null> {
+  const { tmdbApiKey } = await getConfig()
   const res = await fetch(
-    `${BASE}/find/${imdbId}?api_key=${apiKey()}&external_source=imdb_id`
+    `${BASE}/find/${imdbId}?api_key=${tmdbApiKey}&external_source=imdb_id`
   )
   if (!res.ok) return null
   const data = await res.json()
   const hit = data.movie_results?.[0]
   if (!hit) return null
-  return fetchDetails(hit.id)
+  return fetchDetails(hit.id, tmdbApiKey)
 }
 
 export async function searchByTitle(
   title: string,
   year?: number
 ): Promise<TmdbMovieDetails | null> {
+  const { tmdbApiKey } = await getConfig()
   const yearParam = year ? `&year=${year}` : ''
   const res = await fetch(
-    `${BASE}/search/movie?api_key=${apiKey()}&query=${encodeURIComponent(title)}${yearParam}`
+    `${BASE}/search/movie?api_key=${tmdbApiKey}&query=${encodeURIComponent(title)}${yearParam}`
   )
   if (!res.ok) return null
   const data = await res.json()
   const hit = data.results?.[0]
   if (!hit) return null
-  return fetchDetails(hit.id)
+  return fetchDetails(hit.id, tmdbApiKey)
 }
 
 export async function lookupCriterionSlug(
   slug: string
 ): Promise<TmdbMovieDetails | null> {
-  // Try scraping the Criterion page for the canonical title first.
-  // This is blocked by Cloudflare in many server environments, so we
-  // fall back to deriving the title from the slug.
+  const { tmdbApiKey } = await getConfig()
   try {
     const res = await fetch(`https://www.criterion.com/films/${slug}`)
     if (res.ok) {
@@ -72,8 +69,6 @@ export async function lookupCriterionSlug(
     // fall through
   }
 
-  // Fallback: derive title from slug. Format is "{numeric-id}-{title-with-dashes}"
-  // e.g. "27910-3-10-to-yuma" → "3 10 to yuma"
   const titleSlug = slug.replace(/^\d+-/, '')
   const title = titleSlug.replace(/-/g, ' ')
   return searchByTitle(title)

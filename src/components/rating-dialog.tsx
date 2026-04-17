@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ThumbRating } from './thumb-rating'
-import { otherUser, USER_KEYS } from '@/lib/users'
+import { otherUser, USER_KEYS } from '@/lib/user-utils'
 import type { Movie, User, Rating, RatingValue } from '@/types'
 
 type Step = 'who' | 'form' | 'waiting' | 'reveal'

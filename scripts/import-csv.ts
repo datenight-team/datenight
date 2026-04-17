@@ -19,7 +19,6 @@
  *  4. Skip duplicates (by IMDB ID)
  *  5. Print a summary of results
  *
- * TMDB_API_KEY must be set in .env.local (or the environment).
  * DATABASE_URL must be set in .env.local (or the environment).
  */
 
@@ -62,11 +61,6 @@ async function main() {
 
   if (!csvPath) {
     console.error('Usage: npx tsx scripts/import-csv.ts <path-to-csv> [title-column]')
-    process.exit(1)
-  }
-
-  if (!process.env.TMDB_API_KEY) {
-    console.error('TMDB_API_KEY is not set. Add it to .env.local.')
     process.exit(1)
   }
 

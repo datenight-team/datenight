@@ -4,10 +4,11 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const tabs = [
-  { href: '/watchlist', label: 'List',    icon: '📋' },
-  { href: '/watched',   label: 'Watched', icon: '✅' },
-  { href: '/add',       label: 'Add',     icon: '➕' },
+  { href: '/watchlist', label: 'List',     icon: '📋' },
+  { href: '/watched',   label: 'Watched',  icon: '✅' },
+  { href: '/add',       label: 'Add',      icon: '➕' },
   { href: '/recommendations', label: 'Recs', icon: '🎯' },
+  { href: '/settings',  label: 'Settings', icon: '⚙️' },
 ]
 
 export function MobileBottomNav() {

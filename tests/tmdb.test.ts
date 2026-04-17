@@ -4,8 +4,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
-// Import after stubbing
+vi.mock('@/lib/config', () => ({
+  getConfig: vi.fn(),
+}))
+
+import { getConfig } from '@/lib/config'
 const { findByImdbId, searchByTitle, lookupCriterionSlug } = await import('@/lib/tmdb')
+
+const mockConfig = {
+  tmdbApiKey: 'test-key',
+  user1Name: 'User 1', user2Name: 'User 2',
+  seerrUrl: '', seerrPublicUrl: '', seerrApiKey: '', seerrConcurrency: '',
+  plexUrl: '', plexToken: '', anthropicApiKey: '',
+}
 
 const detailsResponse = {
   id: 345911,
@@ -20,7 +31,7 @@ const detailsResponse = {
 describe('findByImdbId', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.TMDB_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('returns movie details for a valid IMDB ID', async () => {
@@ -59,7 +70,7 @@ describe('findByImdbId', () => {
 describe('searchByTitle', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.TMDB_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('returns first result for a title search', async () => {
@@ -86,7 +97,7 @@ describe('searchByTitle', () => {
 describe('lookupCriterionSlug', () => {
   beforeEach(() => {
     mockFetch.mockReset()
-    process.env.TMDB_API_KEY = 'test-key'
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
   })
 
   it('extracts title from og:title and searches TMDB', async () => {

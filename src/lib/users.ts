@@ -1,18 +1,13 @@
 // src/lib/users.ts
-// User identity for the two-person rating system.
-// Internal keys (user1/user2) are stable and stored in the database.
-// Display names are configured via USER1_NAME / USER2_NAME env vars.
+import { getConfig } from './config'
 import type { User } from '@/types'
 
-export const USER_KEYS: User[] = ['user1', 'user2']
+export { USER_KEYS, otherUser } from './user-utils'
 
-export function getUserNames(): Record<User, string> {
+export async function getUserNames(): Promise<Record<User, string>> {
+  const config = await getConfig()
   return {
-    user1: process.env.USER1_NAME?.trim() || 'User 1',
-    user2: process.env.USER2_NAME?.trim() || 'User 2',
+    user1: config.user1Name || 'User 1',
+    user2: config.user2Name || 'User 2',
   }
-}
-
-export function otherUser(user: User): User {
-  return user === 'user1' ? 'user2' : 'user1'
 }

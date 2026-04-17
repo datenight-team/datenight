@@ -69,7 +69,7 @@ typecheck: ## Run TypeScript type checker
 	npx tsc --noEmit
 
 .PHONY: check
-check: test-run lint typecheck ## Run all checks (tests + lint + types)
+check: test-run lint typecheck build ## Run all checks (tests + lint + types + build)
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 

@@ -1,12 +1,5 @@
 // src/lib/plex.ts
-
-function base() { return process.env.PLEX_URL }
-function token() { return process.env.PLEX_TOKEN ?? '' }
-
-function plexUrl(path: string, params: Record<string, string> = {}) {
-  const q = new URLSearchParams({ ...params, 'X-Plex-Token': token() })
-  return `${base()}${path}?${q}`
-}
+import { getConfig } from './config'
 
 const jsonHeaders = {
   Accept: 'application/json',
@@ -16,14 +9,21 @@ const jsonHeaders = {
   'X-Plex-Platform': 'Node.js',
 }
 
+function plexUrl(base: string, token: string, path: string, params: Record<string, string> = {}) {
+  const q = new URLSearchParams({ ...params, 'X-Plex-Token': token })
+  return `${base}${path}?${q}`
+}
+
 export async function getMachineIdentifier(): Promise<string> {
-  const res = await fetch(plexUrl('/identity'), { headers: jsonHeaders })
+  const { plexUrl: base, plexToken: token } = await getConfig()
+  const res = await fetch(plexUrl(base, token, '/identity'), { headers: jsonHeaders })
   const data = await res.json()
   return data.MediaContainer.machineIdentifier as string
 }
 
 export async function findMovieLibrarySectionId(): Promise<string | null> {
-  const res = await fetch(plexUrl('/library/sections'), { headers: jsonHeaders })
+  const { plexUrl: base, plexToken: token } = await getConfig()
+  const res = await fetch(plexUrl(base, token, '/library/sections'), { headers: jsonHeaders })
   if (!res.ok) return null
   const data = await res.json()
   const sections = (data.MediaContainer?.Directory ?? []) as Array<{
@@ -31,7 +31,6 @@ export async function findMovieLibrarySectionId(): Promise<string | null> {
     key: string
     title: string
   }>
-  // Prefer a section literally named "Movies" to avoid ambiguity with "Music Videos"
   const movies = sections.filter((s) => s.type === 'movie')
   return (
     movies.find((s) => s.title.toLowerCase() === 'movies')?.key ??
@@ -40,18 +39,15 @@ export async function findMovieLibrarySectionId(): Promise<string | null> {
   )
 }
 
-// The modern Plex Movie agent (tv.plex.agents.movie) stores IMDB/TMDB IDs as
-// secondary GUIDs in a Guid array, not as the primary guid field. The
-// /library/all?guid=imdb://... endpoint only matches the primary guid, so it
-// always returns empty. Title + year search within the section is reliable.
 export async function findMovieRatingKey(
   sectionId: string,
   title: string,
   year: number
 ): Promise<string | null> {
+  const { plexUrl: base, plexToken: token } = await getConfig()
   try {
     const res = await fetch(
-      plexUrl(`/library/sections/${sectionId}/search`, { query: title, type: '1' }),
+      plexUrl(base, token, `/library/sections/${sectionId}/search`, { query: title, type: '1' }),
       { headers: jsonHeaders }
     )
     if (!res.ok) return null
@@ -68,11 +64,13 @@ export async function findMovieRatingKey(
 }
 
 async function findCollection(
+  base: string,
+  token: string,
   sectionId: string,
   title: string
 ): Promise<string | null> {
   const res = await fetch(
-    plexUrl(`/library/sections/${sectionId}/collections`),
+    plexUrl(base, token, `/library/sections/${sectionId}/collections`),
     { headers: jsonHeaders }
   )
   if (!res.ok) return null
@@ -84,14 +82,16 @@ async function findCollection(
   return list.find((c) => c.title === title)?.ratingKey ?? null
 }
 
-async function deleteCollection(collectionKey: string): Promise<void> {
-  await fetch(plexUrl(`/library/collections/${collectionKey}`), {
+async function deleteCollection(base: string, token: string, collectionKey: string): Promise<void> {
+  await fetch(plexUrl(base, token, `/library/collections/${collectionKey}`), {
     method: 'DELETE',
     headers: jsonHeaders,
   })
 }
 
 async function createCollection(
+  base: string,
+  token: string,
   title: string,
   sectionId: string,
   machineId: string,
@@ -99,7 +99,7 @@ async function createCollection(
 ): Promise<string | null> {
   const uri = `server://${machineId}/com.plexapp.plugins.library/library/metadata/${ratingKeys.join(',')}`
   const res = await fetch(
-    plexUrl('/library/collections', {
+    plexUrl(base, token, '/library/collections', {
       type: '1',
       title,
       sectionId,
@@ -117,6 +117,8 @@ export async function syncDateNightCollection(
 ): Promise<void> {
   if (movies.length === 0) return
 
+  const { plexUrl: base, plexToken: token } = await getConfig()
+
   const [machineId, sectionId] = await Promise.all([
     getMachineIdentifier(),
     findMovieLibrarySectionId(),
@@ -130,10 +132,10 @@ export async function syncDateNightCollection(
 
   if (ratingKeys.length === 0) return
 
-  const existingKey = await findCollection(sectionId, 'Date Night')
+  const existingKey = await findCollection(base, token, sectionId, 'Date Night')
   if (existingKey) {
-    await deleteCollection(existingKey)
+    await deleteCollection(base, token, existingKey)
   }
 
-  await createCollection('Date Night', sectionId, machineId, ratingKeys)
+  await createCollection(base, token, 'Date Night', sectionId, machineId, ratingKeys)
 }
