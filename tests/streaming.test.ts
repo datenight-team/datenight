@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     movie: { update: vi.fn(), findMany: vi.fn() },
     streamingProvider: { deleteMany: vi.fn(), createMany: vi.fn() },
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
 }))
 
@@ -93,16 +94,17 @@ describe('syncMovieProviders', () => {
     mockFetch.mockResolvedValue({ ok: false })
   })
 
-  it('only updates streamingLastChecked when TMDB returns no data', async () => {
+  it('clears existing providers and updates streamingLastChecked when TMDB returns no data', async () => {
     vi.mocked(fetchWatchProviders).mockResolvedValue(null)
+    vi.mocked(prisma.streamingProvider.deleteMany).mockResolvedValue({ count: 0 } as any)
     vi.mocked(prisma.movie.update).mockResolvedValue({} as any)
 
     await syncMovieProviders(1, 345911)
 
-    expect(prisma.streamingProvider.deleteMany).not.toHaveBeenCalled()
+    expect(prisma.streamingProvider.deleteMany).toHaveBeenCalledWith({ where: { movieId: 1 } })
     expect(prisma.movie.update).toHaveBeenCalledWith({
       where: { id: 1 },
-      data: { streamingLastChecked: expect.any(Date) },
+      data: { streamingLastChecked: expect.any(Date), streamingLink: null },
     })
   })
 

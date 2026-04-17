@@ -22,8 +22,8 @@ export async function downloadProviderLogo(providerId: number, logoPath: string)
     if (!res.ok) return
     const buf = new Uint8Array(await res.arrayBuffer())
     await writeFile(filePath, buf)
-  } catch {
-    // non-fatal: logo download failure is logged by caller
+  } catch (err) {
+    console.warn(`[streaming] Failed to download logo for provider ${providerId}:`, err)
   }
 }
 
@@ -35,10 +35,13 @@ export async function syncMovieProviders(movieId: number, tmdbId: number): Promi
   const data = await fetchWatchProviders(tmdbId, region)
 
   if (!data) {
-    await prisma.movie.update({
-      where: { id: movieId },
-      data: { streamingLastChecked: now },
-    })
+    await prisma.$transaction([
+      prisma.streamingProvider.deleteMany({ where: { movieId } }),
+      prisma.movie.update({
+        where: { id: movieId },
+        data: { streamingLastChecked: now, streamingLink: null },
+      }),
+    ])
     return
   }
 

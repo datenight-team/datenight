@@ -120,6 +120,7 @@ export function MovieRow({
           {isStreamable && (
             <div className="flex items-center gap-1.5 flex-wrap justify-end">
               {streamingProviders.map((p) => (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={p.providerId}
                   src={`/streaming-logos/${p.providerId}.png`}
@@ -133,14 +134,16 @@ export function MovieRow({
                   }}
                 />
               ))}
-              <a
-                href={streamingLink ?? "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
-              >
-                Watch ↗
-              </a>
+              {streamingLink && (
+                <a
+                  href={streamingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
+                >
+                  Watch ↗
+                </a>
+              )}
             </div>
           )}
 

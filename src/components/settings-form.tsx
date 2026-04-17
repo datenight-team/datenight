@@ -138,16 +138,17 @@ export function SettingsForm({
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
   const [providers, setProviders] = useState<StreamingProviderOption[]>([])
-  const [loadingProviders, setLoadingProviders] = useState(false)
+  // tracks which region the current providers list was fetched for;
+  // differs from `region` while a fetch is in flight → derived loading state
+  const [loadedRegion, setLoadedRegion] = useState<string | null>(null)
 
   const region = values['streaming_region'] || 'US'
+  const loadingProviders = loadedRegion !== region
   useEffect(() => {
-    setLoadingProviders(true)
     fetch('/api/streaming-providers')
       .then((r) => r.json())
-      .then((data) => setProviders(data))
-      .catch(() => {})
-      .finally(() => setLoadingProviders(false))
+      .then((data) => { setProviders(data); setLoadedRegion(region) })
+      .catch(() => { setProviders([]); setLoadedRegion(region) })
   }, [region])
 
   function set(key: string, value: string) {
@@ -353,6 +354,7 @@ export function SettingsForm({
                           : 'border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
                       }`}
                     >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={`/streaming-logos/${p.providerId}.png`}
                         alt=""
