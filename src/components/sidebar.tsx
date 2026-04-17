@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { PlexSyncButton, AskClaudeLink } from './sidebar-utils'
+import { PlexSyncButton, StreamingRefreshButton, AskClaudeLink } from './sidebar-utils'
 
 const navItems = [
   { href: '/watchlist', label: 'Watch List', icon: '📋' },
@@ -63,6 +63,7 @@ export function Sidebar() {
           🎬 Browse IMDB
         </a>
         <PlexSyncButton />
+        <StreamingRefreshButton />
         <AskClaudeLink />
         <Link
           href="/settings"

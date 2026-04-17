@@ -34,6 +34,43 @@ export function PlexSyncButton() {
   )
 }
 
+export function StreamingRefreshButton() {
+  const [state, setState] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+
+  async function handleClick() {
+    setState('loading')
+    try {
+      const res = await fetch('/api/streaming-providers/refresh', { method: 'POST' })
+      if (res.ok) {
+        setState('ok')
+        window.dispatchEvent(new CustomEvent('streaming-refreshed'))
+      } else {
+        setState('error')
+      }
+    } catch {
+      setState('error')
+    } finally {
+      setTimeout(() => setState('idle'), 3000)
+    }
+  }
+
+  const label =
+    state === 'loading' ? '⏳ Refreshing…'
+    : state === 'ok'    ? '✅ Refreshed!'
+    : state === 'error' ? '❌ Failed'
+    :                     '📡 Refresh Streaming'
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={state === 'loading'}
+      className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"
+    >
+      {label}
+    </button>
+  )
+}
+
 export function AskClaudeLink() {
   const [href, setHref] = useState('https://claude.ai/')
 

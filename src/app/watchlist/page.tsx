@@ -80,6 +80,11 @@ export default function WatchlistPage() {
     return () => controller.abort()
   }, [])
 
+  useEffect(() => {
+    window.addEventListener('streaming-refreshed', fetchMovies)
+    return () => window.removeEventListener('streaming-refreshed', fetchMovies)
+  }, [fetchMovies])
+
   const lowerSearch = search.toLowerCase()
   const filteredMovies = movies.filter((m) => {
     if (!m.title.toLowerCase().includes(lowerSearch)) return false
