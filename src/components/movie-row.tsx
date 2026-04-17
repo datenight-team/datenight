@@ -1,7 +1,6 @@
 // src/components/movie-row.tsx
 "use client";
 import { useState } from "react";
-import { StatusBadge } from "./status-badge";
 import { MoviePoster } from "./movie-poster";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +12,20 @@ import {
 import type { Movie } from "@/types";
 import { formatRuntime } from "@/lib/utils";
 
+const SEERR_LABEL: Record<string, string> = {
+  not_requested: "Not Requested",
+  pending: "Queued",
+  processing: "Downloading",
+  available: "Ready",
+  deleted: "Deleted",
+};
+
 interface MovieRowProps {
   movie: Movie;
   position: number;
   seerrUrl?: string | null;
+  streamingProviders: { providerId: number; providerName: string }[];
+  streamingLink: string | null;
   onMarkWatched: (movie: Movie) => void;
   onForceDownload: (movieId: number) => void;
   onRemove: (movieId: number, opts: { seerr: boolean }) => void;
@@ -26,12 +35,21 @@ export function MovieRow({
   movie,
   position,
   seerrUrl,
+  streamingProviders,
+  streamingLink,
   onMarkWatched,
   onForceDownload,
   onRemove,
 }: MovieRowProps) {
   const [confirming, setConfirming] = useState(false);
   const [askSeerr, setAskSeerr] = useState(false);
+
+  const isStreamable = streamingProviders.length > 0;
+
+  const seerrPillClass =
+    movie.seerrStatus === "available"
+      ? "bg-amber-50 text-amber-700 border-amber-200"
+      : "bg-stone-100 text-stone-500 border-stone-200";
 
   const handleConfirmRemove = () => {
     setConfirming(false);
@@ -44,17 +62,19 @@ export function MovieRow({
 
   return (
     <>
-      <div className="flex items-center gap-3 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
+      <div className="flex items-start gap-3 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
         {/* Position */}
-        <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0">
+        <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0 pt-3">
           {position}
         </span>
 
         {/* Poster */}
-        <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="sm" />
+        <div className="pt-1">
+          <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="sm" />
+        </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pt-1">
           <div className="font-semibold text-stone-900 text-sm truncate">
             {movie.title}
           </div>
@@ -76,30 +96,93 @@ export function MovieRow({
           </div>
         </div>
 
-        {/* Status + Actions */}
+        {/* Actions column */}
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <StatusBadge status={movie.seerrStatus} />
-          {movie.seerrStatus === "available" && (
-            <Button
-              size="sm"
-              className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
-              onClick={() => onMarkWatched(movie)}
-            >
-              Mark Watched
-            </Button>
+          {/* Row 1: Streaming pill + Seerr status pill */}
+          <div className="flex gap-1.5 flex-wrap justify-end">
+            {isStreamable ? (
+              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
+                Streaming
+              </span>
+            ) : (
+              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-stone-100 text-stone-500 border-stone-200">
+                Not Streaming
+              </span>
+            )}
+            <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${seerrPillClass}`}>
+              {SEERR_LABEL[movie.seerrStatus] ?? movie.seerrStatus}
+            </span>
+          </div>
+
+          {/* Row 2: Watch on X buttons (streamable only) */}
+          {isStreamable && (
+            <div className="flex gap-1 flex-wrap justify-end">
+              {streamingProviders.map((p) => (
+                <a
+                  key={p.providerId}
+                  href={streamingLink ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
+                >
+                  <img
+                    src={`/streaming-logos/${p.providerId}.png`}
+                    alt=""
+                    width={12}
+                    height={12}
+                    className="rounded-sm object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  {p.providerName}
+                </a>
+              ))}
+            </div>
           )}
-          {(movie.seerrStatus === "not_requested" ||
-            movie.seerrStatus === "pending") && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-6 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
-              onClick={() => onForceDownload(movie.id)}
-            >
-              Download Now
-            </Button>
-          )}
-          {/* Remove — two-tap confirm so it's hard to trigger accidentally */}
+
+          {/* Row 3: Action buttons */}
+          <div className="flex gap-1">
+            {isStreamable ? (
+              <>
+                <Button
+                  size="sm"
+                  className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                  onClick={() => onMarkWatched(movie)}
+                >
+                  Mark Watched
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-6 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                  onClick={() => onForceDownload(movie.id)}
+                >
+                  Download Now
+                </Button>
+              </>
+            ) : movie.seerrStatus === "available" ? (
+              <Button
+                size="sm"
+                className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() => onMarkWatched(movie)}
+              >
+                Mark Watched
+              </Button>
+            ) : movie.seerrStatus === "not_requested" ||
+              movie.seerrStatus === "pending" ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-6 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                onClick={() => onForceDownload(movie.id)}
+              >
+                Download Now
+              </Button>
+            ) : null}
+          </div>
+
+          {/* Row 4: Remove (two-tap confirm) — always last */}
           {confirming ? (
             <div className="flex gap-1">
               <Button
@@ -131,7 +214,7 @@ export function MovieRow({
         </div>
       </div>
 
-      {/* Seerr cleanup dialog — only shown when movie has a Seerr entry */}
+      {/* Seerr cleanup dialog */}
       <Dialog open={askSeerr} onOpenChange={(o) => !o && setAskSeerr(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
