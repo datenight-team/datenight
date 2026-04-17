@@ -4,9 +4,9 @@ A home-lab web app for two people to manage their Criterion Collection date nigh
 
 ## Project Status
 
-**Implementation complete and extended beyond original 18-task plan. 120/120 tests passing (18 test files). Build clean.**
+**Implementation complete and extended beyond original 18-task plan. 153/153 tests passing (22 test files). Build clean.**
 
-Post-plan additions: configurable user names, thumbs up/down rating system, delete button on movie rows, loading skeletons, bulk CSV import, Claude-powered recommendations, GitHub Actions CI, Plex collection sync (replaced playlist), manual Sync Plex sidebar button, Browse Criterion + Browse IMDB sidebar links, Ask Claude sidebar link (pre-fills claude.ai with recently watched films), mobile-responsive layout (bottom nav + header on small screens), expanded watched view with `MovieReviewModal` (click any watched card for full review detail), delete reviews via `EditRatingDialog`, `FilterBar` component on watchlist.
+Post-plan additions: configurable user names, thumbs up/down rating system, delete button on movie rows, loading skeletons, bulk CSV import, Claude-powered recommendations, GitHub Actions CI, Plex collection sync (replaced playlist), manual Sync Plex sidebar button, Browse Criterion + Browse IMDB sidebar links, Ask Claude sidebar link (pre-fills claude.ai with recently watched films), mobile-responsive layout (bottom nav + header on small screens), expanded watched view with `MovieReviewModal` (click any watched card for full review detail), delete reviews via `EditRatingDialog`, `FilterBar` component on watchlist, streaming availability via TMDB Watch Providers API (per-movie provider badges, Streamable filter, manual `📡 Refresh Streaming` sidebar button, 12h cron refresh, configurable region + services in Settings).
 
 
 ## Tech Stack
