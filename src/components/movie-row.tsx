@@ -45,6 +45,7 @@ export function MovieRow({
   const [askSeerr, setAskSeerr] = useState(false);
 
   const isStreamable = streamingProviders.length > 0;
+  const isCheckingStreaming = !isStreamable && movie.streamingLastChecked == null;
 
   const seerrPillClass =
     movie.seerrStatus === "available"
@@ -98,15 +99,16 @@ export function MovieRow({
 
         {/* Actions column */}
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          {/* Row 1: Streaming pill + Seerr status pill */}
+          {/* Row 1: Streaming pill (positive state only) + Seerr status pill */}
           <div className="flex gap-1.5 flex-wrap justify-end">
-            {isStreamable ? (
+            {isStreamable && (
               <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
                 Streaming
               </span>
-            ) : (
-              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-stone-100 text-stone-500 border-stone-200">
-                Not Streaming
+            )}
+            {isCheckingStreaming && (
+              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-500 border-amber-200">
+                Checking…
               </span>
             )}
             <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${seerrPillClass}`}>
@@ -114,30 +116,31 @@ export function MovieRow({
             </span>
           </div>
 
-          {/* Row 2: Watch on X buttons (streamable only) */}
+          {/* Row 2: Provider logos (decorative) + single Where to Watch link */}
           {isStreamable && (
-            <div className="flex gap-1 flex-wrap justify-end">
+            <div className="flex items-center gap-1.5 flex-wrap justify-end">
               {streamingProviders.map((p) => (
-                <a
+                <img
                   key={p.providerId}
-                  href={streamingLink ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
-                >
-                  <img
-                    src={`/streaming-logos/${p.providerId}.png`}
-                    alt=""
-                    width={12}
-                    height={12}
-                    className="rounded-sm object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  {p.providerName}
-                </a>
+                  src={`/streaming-logos/${p.providerId}.png`}
+                  alt={p.providerName}
+                  title={p.providerName}
+                  width={16}
+                  height={16}
+                  className="rounded-sm object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
               ))}
+              <a
+                href={streamingLink ?? "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
+              >
+                Watch ↗
+              </a>
             </div>
           )}
 

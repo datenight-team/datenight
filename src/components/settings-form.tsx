@@ -140,6 +140,7 @@ export function SettingsForm({
   const [providers, setProviders] = useState<StreamingProviderOption[]>([])
   const [loadingProviders, setLoadingProviders] = useState(false)
 
+  const region = values['streaming_region'] || 'US'
   useEffect(() => {
     setLoadingProviders(true)
     fetch('/api/streaming-providers')
@@ -147,7 +148,7 @@ export function SettingsForm({
       .then((data) => setProviders(data))
       .catch(() => {})
       .finally(() => setLoadingProviders(false))
-  }, [])
+  }, [region])
 
   function set(key: string, value: string) {
     setValues((v) => ({ ...v, [key]: value }))
@@ -286,16 +287,44 @@ export function SettingsForm({
             >
               Region
             </label>
-            <Input
+            <select
               id="streaming_region"
-              type="text"
               value={values['streaming_region'] ?? 'US'}
-              onChange={(e) => set('streaming_region', e.target.value.toUpperCase())}
-              placeholder="US"
-              className="bg-amber-50 border-amber-200 focus:border-amber-500 w-20"
-            />
+              onChange={(e) => set('streaming_region', e.target.value)}
+              className="w-64 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            >
+              <option value="AR">Argentina</option>
+              <option value="AU">Australia</option>
+              <option value="AT">Austria</option>
+              <option value="BE">Belgium</option>
+              <option value="BR">Brazil</option>
+              <option value="CA">Canada</option>
+              <option value="CL">Chile</option>
+              <option value="CO">Colombia</option>
+              <option value="DK">Denmark</option>
+              <option value="FI">Finland</option>
+              <option value="FR">France</option>
+              <option value="DE">Germany</option>
+              <option value="IN">India</option>
+              <option value="IE">Ireland</option>
+              <option value="IT">Italy</option>
+              <option value="JP">Japan</option>
+              <option value="KR">South Korea</option>
+              <option value="MX">Mexico</option>
+              <option value="NL">Netherlands</option>
+              <option value="NZ">New Zealand</option>
+              <option value="NO">Norway</option>
+              <option value="PL">Poland</option>
+              <option value="PT">Portugal</option>
+              <option value="ZA">South Africa</option>
+              <option value="ES">Spain</option>
+              <option value="SE">Sweden</option>
+              <option value="CH">Switzerland</option>
+              <option value="GB">United Kingdom</option>
+              <option value="US">United States</option>
+            </select>
             <p className="text-xs text-amber-600">
-              ISO 3166-1 alpha-2 code (e.g. US, GB, AU). Determines which streaming services are shown.
+              Determines which streaming services are shown.
             </p>
           </div>
 

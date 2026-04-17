@@ -1,6 +1,7 @@
 // src/app/watchlist/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Play } from 'lucide-react'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
 import { FilterBar } from '@/components/filter-bar'
@@ -13,7 +14,6 @@ const STATUS_BUTTONS = [
   { label: 'Queued', value: 'pending' },
   { label: 'Downloading', value: 'processing' },
   { label: 'Ready', value: 'available' },
-  { label: '▶ Streamable', value: 'streamable' },
 ]
 
 function getMatchingProviders(movie: Movie, serviceIds: number[]): StreamingProvider[] {
@@ -43,6 +43,7 @@ export default function WatchlistPage() {
   const [streamingServiceIds, setStreamingServiceIds] = useState<number[]>([])
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  const [streamableOnly, setStreamableOnly] = useState(false)
 
   const fetchMovies = useCallback(async () => {
     const data = await fetch('/api/movies').then((r) => r.json())
@@ -82,7 +83,7 @@ export default function WatchlistPage() {
   const lowerSearch = search.toLowerCase()
   const filteredMovies = movies.filter((m) => {
     if (!m.title.toLowerCase().includes(lowerSearch)) return false
-    if (activeFilter === 'streamable') return getMatchingProviders(m, streamingServiceIds).length > 0
+    if (streamableOnly && getMatchingProviders(m, streamingServiceIds).length === 0) return false
     return activeFilter === null || m.seerrStatus === activeFilter
   })
 
@@ -139,6 +140,22 @@ export default function WatchlistPage() {
             onButtonChange={setActiveFilter}
           />
 
+          {streamingServiceIds.length > 0 && (
+            <div className="mb-3">
+              <button
+                onClick={() => setStreamableOnly((v) => !v)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  streamableOnly
+                    ? 'border-green-500 bg-green-500 text-white'
+                    : 'border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+                }`}
+              >
+                <Play size={10} />
+                Streamable only
+              </button>
+            </div>
+          )}
+
           <div>
             {filteredMovies.map((movie, index) => {
               const matchingProviders = getMatchingProviders(movie, streamingServiceIds)
@@ -163,7 +180,7 @@ export default function WatchlistPage() {
               <div className="text-5xl mb-4">🎬</div>
               <p className="font-medium">{search || activeFilter ? 'No movies match your filter' : 'No movies yet'}</p>
               <p className="text-sm text-amber-500 mt-1">
-                {activeFilter === 'streamable'
+                {streamableOnly
                   ? 'Configure your streaming services in Settings'
                   : search || activeFilter
                   ? 'Try clearing the search or filter'
