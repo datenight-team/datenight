@@ -48,6 +48,7 @@ history and a third, wildcard recommendation to expand your horizons.
 ## Features
 
 - **Add movies** by pasting an IMDB or Criterion Collection URL — metadata pulled from TMDB automatically. Simple and easy for anyone to understand and use.
+- **Streaming availability** — each watchlist movie shows which of your subscribed services carry it, with direct links to watch; a **▶ Streamable** filter narrows the list to films you can watch tonight; a **Refresh Streaming** button in the sidebar re-syncs availability on demand (no waiting for the 12-hour cron)
 - **Plex integration** — a "Date Night" collection is kept in sync with available movies in watch order; a **Sync Plex** button in the sidebar triggers an on-demand update
 - **Seerr integration** — for managing movie availability and handling clean up post-watch
 - **Blind ratings** — each person gives a thumbs up or down and writes a critic's quote independently (Siskel & Ebert style); results are revealed only after both have rated, with 🤝 if you agreed and ⚔️ if you didn't
@@ -128,6 +129,9 @@ make help       # full list of available commands
 ```
 
 ## Troubleshooting
+
+**Watchlist movies all show "Checking…" for streaming availability**
+Streaming data hasn't synced yet. It runs automatically on movie add and every 12 hours thereafter, but a fresh install or a newly added subscription won't have data until the first sync completes. Click **📡 Refresh Streaming** in the sidebar to trigger an immediate re-sync. Configure which services to track in Settings → Streaming.
 
 **Movies show "Not Requested" and never download**
 Seerr integration is failing silently. Check that `SEERR_URL` and `SEERR_API_KEY` are correct and that the container can reach Seerr. The sync job runs every 5 minutes — check logs: `make docker-logs`.
