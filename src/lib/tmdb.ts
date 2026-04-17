@@ -73,3 +73,54 @@ export async function lookupCriterionSlug(
   const title = titleSlug.replace(/-/g, ' ')
   return searchByTitle(title)
 }
+
+export interface WatchProvider {
+  providerId: number
+  providerName: string
+  logoPath: string
+}
+
+export interface WatchProviders {
+  link: string
+  flatrate: WatchProvider[]
+}
+
+export async function fetchWatchProviders(
+  tmdbId: number,
+  region: string
+): Promise<WatchProviders | null> {
+  const { tmdbApiKey } = await getConfig()
+  if (!tmdbApiKey) return null
+  const res = await fetch(`${BASE}/movie/${tmdbId}/watch/providers?api_key=${tmdbApiKey}`)
+  if (!res.ok) return null
+  const data = await res.json()
+  const regional = data.results?.[region]
+  if (!regional) return null
+  return {
+    link: regional.link ?? '',
+    flatrate: (regional.flatrate ?? []).map(
+      (p: { provider_id: number; provider_name: string; logo_path: string }) => ({
+        providerId: p.provider_id,
+        providerName: p.provider_name,
+        logoPath: p.logo_path,
+      })
+    ),
+  }
+}
+
+export async function fetchProviderList(region: string): Promise<WatchProvider[]> {
+  const { tmdbApiKey } = await getConfig()
+  if (!tmdbApiKey) return []
+  const res = await fetch(
+    `${BASE}/watch/providers/movie?api_key=${tmdbApiKey}&watch_region=${encodeURIComponent(region)}`
+  )
+  if (!res.ok) return []
+  const data = await res.json()
+  return (data.results ?? []).map(
+    (p: { provider_id: number; provider_name: string; logo_path: string }) => ({
+      providerId: p.provider_id,
+      providerName: p.provider_name,
+      logoPath: p.logo_path,
+    })
+  )
+}

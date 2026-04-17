@@ -9,13 +9,14 @@ vi.mock('@/lib/config', () => ({
 }))
 
 import { getConfig } from '@/lib/config'
-const { findByImdbId, searchByTitle, lookupCriterionSlug } = await import('@/lib/tmdb')
+const { findByImdbId, searchByTitle, lookupCriterionSlug, fetchWatchProviders, fetchProviderList } = await import('@/lib/tmdb')
 
 const mockConfig = {
   tmdbApiKey: 'test-key',
   user1Name: 'User 1', user2Name: 'User 2',
   seerrUrl: '', seerrPublicUrl: '', seerrApiKey: '', seerrConcurrency: '',
   plexUrl: '', plexToken: '', anthropicApiKey: '',
+  streamingRegion: 'US', streamingServices: '[]',
 }
 
 const detailsResponse = {
@@ -137,5 +138,88 @@ describe('lookupCriterionSlug', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({ results: [] }) }) // slug search misses
 
     expect(await lookupCriterionSlug('28630-seven-samurai')).toBeNull()
+  })
+})
+
+describe('fetchWatchProviders', () => {
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
+  })
+
+  it('returns flatrate providers for the given region', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        results: {
+          US: {
+            link: 'https://www.themoviedb.org/movie/345911/watch?locale=US',
+            flatrate: [
+              { provider_id: 8, provider_name: 'Netflix', logo_path: '/netflix.jpg' },
+              { provider_id: 337, provider_name: 'Disney+', logo_path: '/disney.jpg' },
+            ],
+          },
+        },
+      }),
+    })
+    const result = await fetchWatchProviders(345911, 'US')
+    expect(result).toEqual({
+      link: 'https://www.themoviedb.org/movie/345911/watch?locale=US',
+      flatrate: [
+        { providerId: 8, providerName: 'Netflix', logoPath: '/netflix.jpg' },
+        { providerId: 337, providerName: 'Disney+', logoPath: '/disney.jpg' },
+      ],
+    })
+  })
+
+  it('returns null when region has no providers', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ results: {} }),
+    })
+    expect(await fetchWatchProviders(345911, 'ZZ')).toBeNull()
+  })
+
+  it('returns null when TMDB key is not configured', async () => {
+    vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, tmdbApiKey: '' })
+    expect(await fetchWatchProviders(345911, 'US')).toBeNull()
+  })
+
+  it('returns null on fetch error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false })
+    expect(await fetchWatchProviders(345911, 'US')).toBeNull()
+  })
+})
+
+describe('fetchProviderList', () => {
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
+  })
+
+  it('returns list of providers for the region', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        results: [
+          { provider_id: 8, provider_name: 'Netflix', logo_path: '/netflix.jpg' },
+          { provider_id: 337, provider_name: 'Disney+', logo_path: '/disney.jpg' },
+        ],
+      }),
+    })
+    const result = await fetchProviderList('US')
+    expect(result).toHaveLength(2)
+    expect(result[0]).toEqual({ providerId: 8, providerName: 'Netflix', logoPath: '/netflix.jpg' })
+    expect(result[1]).toEqual({ providerId: 337, providerName: 'Disney+', logoPath: '/disney.jpg' })
+  })
+
+  it('returns empty array on fetch error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false })
+    expect(await fetchProviderList('US')).toEqual([])
+  })
+
+  it('returns empty array when TMDB key is not configured', async () => {
+    vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, tmdbApiKey: '' })
+    expect(await fetchProviderList('US')).toEqual([])
   })
 })

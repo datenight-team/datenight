@@ -53,7 +53,14 @@ describe('getConfig', () => {
     expect(config.user1Name).toBe('User 1')
   })
 
-  it('maps all ten DB keys to AppConfig fields', async () => {
+  it('returns streaming defaults when no settings exist', async () => {
+    vi.mocked(prisma.setting.findMany).mockResolvedValue([])
+    const config = await getConfig()
+    expect(config.streamingRegion).toBe('US')
+    expect(config.streamingServices).toBe('[]')
+  })
+
+  it('maps all twelve DB keys to AppConfig fields', async () => {
     vi.mocked(prisma.setting.findMany).mockResolvedValue([
       { key: 'user1_name', value: 'A' },
       { key: 'user2_name', value: 'B' },
@@ -65,17 +72,13 @@ describe('getConfig', () => {
       { key: 'plex_url', value: 'G' },
       { key: 'plex_token', value: 'H' },
       { key: 'anthropic_api_key', value: 'I' },
+      { key: 'streaming_region', value: 'GB' },
+      { key: 'streaming_services', value: '[8,337]' },
     ])
     const config = await getConfig()
     expect(config.user1Name).toBe('A')
-    expect(config.user2Name).toBe('B')
-    expect(config.tmdbApiKey).toBe('C')
-    expect(config.seerrUrl).toBe('D')
-    expect(config.seerrPublicUrl).toBe('E')
-    expect(config.seerrApiKey).toBe('F')
-    expect(config.seerrConcurrency).toBe('5')
-    expect(config.plexUrl).toBe('G')
-    expect(config.plexToken).toBe('H')
     expect(config.anthropicApiKey).toBe('I')
+    expect(config.streamingRegion).toBe('GB')
+    expect(config.streamingServices).toBe('[8,337]')
   })
 })

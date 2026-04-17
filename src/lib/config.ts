@@ -12,6 +12,8 @@ export interface AppConfig {
   plexUrl: string
   plexToken: string
   anthropicApiKey: string
+  streamingRegion: string
+  streamingServices: string
 }
 
 const DEFAULTS: AppConfig = {
@@ -25,6 +27,8 @@ const DEFAULTS: AppConfig = {
   plexUrl: '',
   plexToken: '',
   anthropicApiKey: '',
+  streamingRegion: 'US',
+  streamingServices: '[]',
 }
 
 const KEY_MAP: Record<keyof AppConfig, string> = {
@@ -38,6 +42,8 @@ const KEY_MAP: Record<keyof AppConfig, string> = {
   plexUrl: 'plex_url',
   plexToken: 'plex_token',
   anthropicApiKey: 'anthropic_api_key',
+  streamingRegion: 'streaming_region',
+  streamingServices: 'streaming_services',
 }
 
 const DB_TO_CONFIG = Object.fromEntries(

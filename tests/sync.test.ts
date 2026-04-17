@@ -28,6 +28,7 @@ const mockConfig = {
   user1Name: 'User 1', user2Name: 'User 2',
   tmdbApiKey: '', seerrUrl: '', seerrPublicUrl: '', seerrApiKey: '',
   plexUrl: '', plexToken: '', anthropicApiKey: '',
+  streamingRegion: 'US', streamingServices: '[]',
 }
 
 const baseMovie = {
