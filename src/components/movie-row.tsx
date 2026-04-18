@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Movie } from "@/types";
+import type { Movie, StreamingProvider } from "@/types";
 import { formatRuntime } from "@/lib/utils";
 
 const SEERR_LABEL: Record<string, string> = {
@@ -32,7 +32,7 @@ interface MovieRowProps {
   movie: Movie;
   position: number;
   seerrUrl?: string | null;
-  streamingProviders: { providerId: number; providerName: string }[];
+  streamingProviders: StreamingProvider[];
   streamingLink: string | null;
   onMarkWatched: (movie: Movie) => void;
   onForceDownload: (movieId: number) => void;
@@ -136,7 +136,7 @@ export function MovieRow({
                 href={streamingLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded border border-stone-600 bg-stone-800 text-white px-2 py-0.5 text-xs font-medium hover:bg-stone-700 transition-colors"
+                className="rounded border border-amber-400 bg-white text-amber-700 px-2 py-0.5 text-xs font-medium hover:bg-amber-50 transition-colors"
               >
                 Watch ↗
               </a>
