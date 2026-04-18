@@ -8,7 +8,6 @@ const tabs = [
   { href: '/watched',   label: 'Watched',  icon: '✅' },
   { href: '/add',       label: 'Add',      icon: '➕' },
   { href: '/recommendations', label: 'Recs', icon: '🎯' },
-  { href: '/settings',  label: 'Settings', icon: '⚙️' },
 ]
 
 export function MobileBottomNav() {

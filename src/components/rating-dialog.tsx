@@ -30,6 +30,7 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
   const [quote, setQuote] = useState('')
   const [ratings, setRatings] = useState<Rating[]>([])
   const [submitting, setSubmitting] = useState(false)
+  const canSubmit = rating !== undefined && quote.trim().length > 0
   const [error, setError] = useState<string | null>(null)
 
   const handleUserSelect = async (user: User) => {
@@ -106,7 +107,9 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
               <ThumbRating value={rating} onChange={setRating} size="lg" />
             </div>
             <div>
-              <p className="text-xs text-stone-500 mb-1">Critic&apos;s Quote</p>
+              <p className="text-xs text-stone-500 mb-1">
+                Critic&apos;s Quote <span aria-hidden="true" className="text-red-500">*</span>
+              </p>
               <Textarea
                 placeholder="A sentence or two about the film..."
                 value={quote}
@@ -117,9 +120,9 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
             </div>
             {error && <p className="text-red-600 text-xs">{error}</p>}
             <Button
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-40"
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || !canSubmit}
             >
               {submitting ? 'Submitting…' : 'Submit'}
             </Button>

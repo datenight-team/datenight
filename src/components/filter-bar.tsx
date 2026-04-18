@@ -6,12 +6,19 @@ interface FilterButton {
   value: string
 }
 
+interface ExtraPill {
+  label: string
+  active: boolean
+  onToggle: () => void
+}
+
 interface FilterBarProps {
   search: string
   onSearchChange: (value: string) => void
   buttons: FilterButton[]
   activeButton: string | null
   onButtonChange: (value: string | null) => void
+  extraPills?: ExtraPill[]
 }
 
 export function FilterBar({
@@ -20,6 +27,7 @@ export function FilterBar({
   buttons,
   activeButton,
   onButtonChange,
+  extraPills,
 }: FilterBarProps) {
   return (
     <div className="mb-4 space-y-2">
@@ -53,6 +61,19 @@ export function FilterBar({
             }`}
           >
             {btn.label}
+          </button>
+        ))}
+        {extraPills?.map((pill) => (
+          <button
+            key={pill.label}
+            onClick={pill.onToggle}
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+              pill.active
+                ? 'border-green-500 bg-green-500 text-white'
+                : 'border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+            }`}
+          >
+            {pill.label}
           </button>
         ))}
       </div>

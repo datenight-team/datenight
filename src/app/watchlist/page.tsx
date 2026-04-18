@@ -1,7 +1,6 @@
 // src/app/watchlist/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { Play } from 'lucide-react'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
 import { FilterBar } from '@/components/filter-bar'
@@ -143,23 +142,12 @@ export default function WatchlistPage() {
             buttons={STATUS_BUTTONS}
             activeButton={activeFilter}
             onButtonChange={setActiveFilter}
+            extraPills={
+              streamingServiceIds.length > 0
+                ? [{ label: '▶ Streamable', active: streamableOnly, onToggle: () => setStreamableOnly((v) => !v) }]
+                : undefined
+            }
           />
-
-          {streamingServiceIds.length > 0 && (
-            <div className="mb-3">
-              <button
-                onClick={() => setStreamableOnly((v) => !v)}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  streamableOnly
-                    ? 'border-green-500 bg-green-500 text-white'
-                    : 'border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
-                }`}
-              >
-                <Play size={10} />
-                Streamable only
-              </button>
-            </div>
-          )}
 
           <div>
             {filteredMovies.map((movie, index) => {
