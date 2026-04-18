@@ -81,3 +81,24 @@ describe('MovieRow status pill colors', () => {
     expect(pill).toHaveClass('bg-stone-100', 'text-stone-500', 'border-stone-200')
   })
 })
+
+describe('MovieRow layout', () => {
+  it('renders streaming badge inside the info section (not actions column)', () => {
+    render(
+      <MovieRow
+        movie={makeMovie({ seerrStatus: 'available' })}
+        {...defaultProps}
+        streamingProviders={[{ id: 99, movieId: 1, providerId: 8, providerName: 'Netflix' }]}
+        streamingLink="https://netflix.com"
+      />
+    )
+    const infoSection = screen.getByText('Jeanne Dielman').closest('div')
+    expect(infoSection).toContainElement(screen.getByText('Streaming'))
+  })
+
+  it('renders the Seerr status pill inside the info section', () => {
+    render(<MovieRow movie={makeMovie({ seerrStatus: 'pending' })} {...defaultProps} />)
+    const infoSection = screen.getByText('Jeanne Dielman').closest('div')
+    expect(infoSection).toContainElement(screen.getByText('Queued'))
+  })
+})
