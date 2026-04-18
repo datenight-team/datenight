@@ -20,6 +20,14 @@ const SEERR_LABEL: Record<string, string> = {
   deleted: "Deleted",
 };
 
+const SEERR_PILL_CLASS: Record<string, string> = {
+  not_requested: "bg-stone-100 text-stone-500 border-stone-200",
+  pending:       "bg-indigo-50 text-indigo-600 border-indigo-200",
+  processing:    "bg-amber-50 text-amber-600 border-amber-200",
+  available:     "bg-green-50 text-green-700 border-green-200",
+  deleted:       "bg-stone-100 text-stone-500 border-stone-200",
+};
+
 interface MovieRowProps {
   movie: Movie;
   position: number;
@@ -47,10 +55,7 @@ export function MovieRow({
   const isStreamable = streamingProviders.length > 0;
   const isCheckingStreaming = !isStreamable && movie.streamingLastChecked == null;
 
-  const seerrPillClass =
-    movie.seerrStatus === "available"
-      ? "bg-amber-50 text-amber-700 border-amber-200"
-      : "bg-stone-100 text-stone-500 border-stone-200";
+  const seerrPillClass = SEERR_PILL_CLASS[movie.seerrStatus] ?? "bg-stone-100 text-stone-500 border-stone-200";
 
   const handleConfirmRemove = () => {
     setConfirming(false);
