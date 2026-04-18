@@ -14,7 +14,7 @@ describe('PlexSyncButton', () => {
 
   it('renders in idle state', () => {
     render(<PlexSyncButton />)
-    expect(screen.getByText('🎭 Sync Plex')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sync plex/i })).toBeInTheDocument()
   })
 })
 
@@ -23,21 +23,21 @@ describe('StreamingRefreshButton', () => {
 
   it('renders in idle state', () => {
     render(<StreamingRefreshButton />)
-    expect(screen.getByText('📡 Refresh Streaming')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /refresh streaming/i })).toBeInTheDocument()
   })
 
   it('posts to /api/streaming-providers/refresh on click', async () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({ ok: true, json: async () => ({}) } as any)
     render(<StreamingRefreshButton />)
-    fireEvent.click(screen.getByText('📡 Refresh Streaming'))
+    fireEvent.click(screen.getByRole('button', { name: /refresh streaming/i }))
     expect(global.fetch).toHaveBeenCalledWith('/api/streaming-providers/refresh', { method: 'POST' })
   })
 
   it('shows success state after refresh completes', async () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({ ok: true, json: async () => ({}) } as any)
     render(<StreamingRefreshButton />)
-    fireEvent.click(screen.getByText('📡 Refresh Streaming'))
-    await waitFor(() => expect(screen.getByText('✅ Refreshed!')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /refresh streaming/i }))
+    await waitFor(() => expect(screen.getByText('Refreshed!')).toBeInTheDocument())
   })
 
   it('dispatches streaming-refreshed event on success', async () => {
@@ -45,7 +45,7 @@ describe('StreamingRefreshButton', () => {
     const listener = vi.fn()
     window.addEventListener('streaming-refreshed', listener)
     render(<StreamingRefreshButton />)
-    fireEvent.click(screen.getByText('📡 Refresh Streaming'))
+    fireEvent.click(screen.getByRole('button', { name: /refresh streaming/i }))
     await waitFor(() => expect(listener).toHaveBeenCalled())
     window.removeEventListener('streaming-refreshed', listener)
   })
@@ -53,7 +53,7 @@ describe('StreamingRefreshButton', () => {
   it('shows error state when refresh fails', async () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({ ok: false } as any)
     render(<StreamingRefreshButton />)
-    fireEvent.click(screen.getByText('📡 Refresh Streaming'))
-    await waitFor(() => expect(screen.getByText('❌ Failed')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /refresh streaming/i }))
+    await waitFor(() => expect(screen.getByText('Failed')).toBeInTheDocument())
   })
 })
