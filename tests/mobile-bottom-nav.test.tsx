@@ -32,16 +32,30 @@ describe('MobileBottomNav', () => {
 
   it('highlights the active tab', () => {
     render(<MobileBottomNav />)
-    // usePathname returns '/watchlist' — the List link should have the active colour
     const listLink = screen.getByRole('link', { name: /list/i })
     expect(listLink).toHaveClass('text-amber-600')
-    // Active icon span gets the background pill
     const iconSpan = listLink.querySelector('span')
-    expect(iconSpan).toHaveClass('bg-amber-100')
-    // Inactive tabs should not have the active colour or pill
+    expect(iconSpan).toHaveClass('bg-amber-600')
     const watchedLink = screen.getByRole('link', { name: /watched/i })
     expect(watchedLink).not.toHaveClass('text-amber-600')
     const inactiveIconSpan = watchedLink.querySelector('span')
-    expect(inactiveIconSpan).not.toHaveClass('bg-amber-100')
+    expect(inactiveIconSpan).not.toHaveClass('bg-amber-600')
+  })
+
+  it('applies bold font weight to the active tab label', () => {
+    render(<MobileBottomNav />)
+    const listLink = screen.getByRole('link', { name: /list/i })
+    const spans = listLink.querySelectorAll('span')
+    const labelSpan = spans[spans.length - 1]
+    expect(labelSpan).toHaveClass('font-bold')
+  })
+
+  it('wraps tab emoji icons with aria-hidden', () => {
+    render(<MobileBottomNav />)
+    const links = screen.getAllByRole('link')
+    links.forEach((link) => {
+      const iconSpan = link.querySelector('span[aria-hidden="true"]')
+      expect(iconSpan).not.toBeNull()
+    })
   })
 })

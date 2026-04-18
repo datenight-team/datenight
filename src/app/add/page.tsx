@@ -81,9 +81,28 @@ export default function AddMoviePage() {
         <p className="text-red-600 text-sm mb-4">{error}</p>
       )}
 
-      <p className="text-xs text-amber-600 mb-6">
+      <p className="text-xs text-amber-600">
         Supports imdb.com/title/... and criterion.com/films/... URLs
       </p>
+
+      <div className="flex gap-4 text-xs text-amber-600 mb-6">
+        <a
+          href="https://www.criterion.com/shop/browse/list?q=&format=all"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-amber-800 underline transition-colors"
+        >
+          🎞️ Browse Criterion
+        </a>
+        <a
+          href="https://www.imdb.com/search/title/?title_type=feature"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-amber-800 underline transition-colors"
+        >
+          🎬 Browse IMDB
+        </a>
+      </div>
 
       {preview && (
         <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">

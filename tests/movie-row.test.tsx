@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MovieRow } from '@/components/movie-row'
-import type { Movie, User } from '@/types'
+import type { Movie } from '@/types'
 
 vi.mock('next/image', () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
@@ -100,5 +100,19 @@ describe('MovieRow layout', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'pending' })} {...defaultProps} />)
     const infoSection = screen.getByText('Jeanne Dielman').closest('div')
     expect(infoSection).toContainElement(screen.getByText('Queued'))
+  })
+
+  it('renders Watch link with amber outline instead of dark stone', () => {
+    render(
+      <MovieRow
+        movie={makeMovie({ seerrStatus: 'available' })}
+        {...defaultProps}
+        streamingProviders={[{ id: 99, movieId: 1, providerId: 8, providerName: 'Netflix' }]}
+        streamingLink="https://netflix.com"
+      />
+    )
+    const watchLink = screen.getByRole('link', { name: /watch/i })
+    expect(watchLink).not.toHaveClass('bg-stone-800')
+    expect(watchLink).toHaveClass('border-amber-400')
   })
 })

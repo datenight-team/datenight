@@ -17,11 +17,11 @@ export function PlexSyncButton() {
     }
   }
 
-  const label =
-    state === 'loading' ? '⏳ Syncing…'
-    : state === 'ok'    ? '✅ Synced!'
-    : state === 'error' ? '❌ Failed'
-    :                     '🎭 Sync Plex'
+  const content: { icon: string; text: string } =
+    state === 'loading' ? { icon: '⏳', text: 'Syncing…' }
+    : state === 'ok'    ? { icon: '✅', text: 'Synced!' }
+    : state === 'error' ? { icon: '❌', text: 'Failed' }
+    :                     { icon: '🎭', text: 'Sync Plex' }
 
   return (
     <button
@@ -29,7 +29,8 @@ export function PlexSyncButton() {
       disabled={state === 'loading'}
       className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {label}
+      <span aria-hidden="true">{content.icon}</span>
+      {content.text}
     </button>
   )
 }
@@ -54,11 +55,11 @@ export function StreamingRefreshButton() {
     }
   }
 
-  const label =
-    state === 'loading' ? '⏳ Refreshing…'
-    : state === 'ok'    ? '✅ Refreshed!'
-    : state === 'error' ? '❌ Failed'
-    :                     '📡 Refresh Streaming'
+  const content: { icon: string; text: string } =
+    state === 'loading' ? { icon: '⏳', text: 'Refreshing…' }
+    : state === 'ok'    ? { icon: '✅', text: 'Refreshed!' }
+    : state === 'error' ? { icon: '❌', text: 'Failed' }
+    :                     { icon: '📡', text: 'Refresh Streaming' }
 
   return (
     <button
@@ -66,7 +67,8 @@ export function StreamingRefreshButton() {
       disabled={state === 'loading'}
       className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {label}
+      <span aria-hidden="true">{content.icon}</span>
+      {content.text}
     </button>
   )
 }
@@ -93,7 +95,7 @@ export function AskClaudeLink() {
       rel="noopener noreferrer"
       className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
     >
-      ✨ Ask Claude
+      <span aria-hidden="true">✨</span> Ask Claude
     </a>
   )
 }

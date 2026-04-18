@@ -28,14 +28,17 @@ export function MobileBottomNav() {
           )}
         >
           <span
+            aria-hidden="true"
             className={cn(
               'text-xl mb-0.5 px-3 py-0.5 rounded-full',
-              pathname === href && 'bg-amber-100'
+              pathname === href ? 'bg-amber-600' : ''
             )}
           >
             {icon}
           </span>
-          <span>{label}</span>
+          <span className={cn(pathname === href ? 'font-bold' : 'font-medium')}>
+            {label}
+          </span>
         </Link>
       ))}
     </nav>

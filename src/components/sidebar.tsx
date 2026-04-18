@@ -20,7 +20,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-2 px-4 py-5 border-b border-amber-200">
         <div className="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center text-white text-sm">
-          🎬
+          <span aria-hidden="true">🎬</span>
         </div>
         <span className="font-extrabold text-amber-900 text-sm">Date Night</span>
       </div>
@@ -38,7 +38,7 @@ export function Sidebar() {
                 : 'text-amber-800 hover:bg-amber-100'
             )}
           >
-            <span>{icon}</span>
+            <span aria-hidden="true">{icon}</span>
             {label}
           </Link>
         ))}
@@ -46,22 +46,6 @@ export function Sidebar() {
 
       {/* Utility links */}
       <div className="px-2 py-4 border-t border-amber-200 flex flex-col gap-1">
-        <a
-          href="https://www.criterion.com/shop/browse/list?q=&format=all"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
-        >
-          🎞️ Browse Criterion
-        </a>
-        <a
-          href="https://www.imdb.com/search/title/?title_type=feature"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
-        >
-          🎬 Browse IMDB
-        </a>
         <PlexSyncButton />
         <StreamingRefreshButton />
         <AskClaudeLink />
@@ -72,7 +56,7 @@ export function Sidebar() {
             pathname === '/settings' && 'bg-amber-100 font-semibold'
           )}
         >
-          ⚙️ Settings
+          <span aria-hidden="true">⚙️</span> Settings
         </Link>
       </div>
     </aside>
