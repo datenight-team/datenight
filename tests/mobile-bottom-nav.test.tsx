@@ -25,6 +25,11 @@ describe('MobileBottomNav', () => {
     expect(screen.getByRole('link', { name: /recs/i })).toHaveAttribute('href', '/recommendations')
   })
 
+  it('does not include Settings in the bottom nav tabs', () => {
+    render(<MobileBottomNav />)
+    expect(screen.queryByText('Settings')).not.toBeInTheDocument()
+  })
+
   it('highlights the active tab', () => {
     render(<MobileBottomNav />)
     // usePathname returns '/watchlist' — the List link should have the active colour

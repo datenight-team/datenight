@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import {
   Sheet,
   SheetContent,
@@ -56,6 +57,14 @@ export function MobileHeader() {
             </a>
             <PlexSyncButton />
             <AskClaudeLink />
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              <span aria-hidden="true">⚙️</span>
+              <span>Settings</span>
+            </Link>
           </div>
         </SheetContent>
       </Sheet>
