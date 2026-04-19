@@ -78,25 +78,25 @@ export function MovieReviewModal({
         {ratings.length === 0 ? (
           <p className="text-sm text-stone-400 italic text-center py-6">No reviews yet</p>
         ) : (
-          <div className="grid grid-cols-2 gap-3 py-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
             {renderReviewPanel('user1', r1)}
             {renderReviewPanel('user2', r2)}
           </div>
         )}
 
-        <DialogFooter className="flex-row justify-between gap-2 sm:justify-between">
-          <div className="flex gap-3">
+        <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+          <div className="flex gap-3 flex-wrap">
             <button
               type="button"
               onClick={() => onEditUser('user1')}
-              className="text-xs text-stone-400 hover:text-amber-600 transition-colors"
+              className="text-sm min-h-[44px] flex items-center text-stone-400 hover:text-amber-600 transition-colors"
             >
               Edit {userNames.user1}&apos;s review
             </button>
             <button
               type="button"
               onClick={() => onEditUser('user2')}
-              className="text-xs text-stone-400 hover:text-amber-600 transition-colors"
+              className="text-sm min-h-[44px] flex items-center text-stone-400 hover:text-amber-600 transition-colors"
             >
               Edit {userNames.user2}&apos;s review
             </button>
