@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ThumbRating } from './thumb-rating'
 import { otherUser, USER_KEYS } from '@/lib/user-utils'
+import { cn } from '@/lib/utils'
 import type { Movie, User, Rating, RatingValue } from '@/types'
 
 type Step = 'who' | 'form' | 'waiting' | 'reveal'
@@ -98,7 +99,7 @@ export function RatingDialog({ movie, open, onClose, onComplete, userNames }: Ra
         )}
 
         {step === 'form' && currentUser && (
-          <div className="space-y-4 py-2">
+          <div className={cn('space-y-4 py-2', submitting && 'pointer-events-none opacity-50')}>
             <p className="text-sm text-stone-600">
               {userNames[currentUser]}&apos;s verdict on <em>{movie.title}</em>
             </p>

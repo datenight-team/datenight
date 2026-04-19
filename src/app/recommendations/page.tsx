@@ -78,7 +78,7 @@ export default function RecommendationsPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-amber-900 mb-1">Recommendations</h1>
         <p className="text-sm text-stone-500">
@@ -87,7 +87,7 @@ export default function RecommendationsPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <div
             onClick={() => setCriterionOnly(!criterionOnly)}
@@ -240,7 +240,7 @@ function RecommendationCard({
             ) : (
               <Button
                 size="sm"
-                className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
                 onClick={handleAdd}
                 disabled={adding}
               >

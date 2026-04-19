@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { PlexSyncButton, AskClaudeLink } from './sidebar-utils'
+import { PlexSyncButton, AskClaudeLink, StreamingRefreshButton } from './sidebar-utils'
 
 export function MobileHeader() {
   const [open, setOpen] = useState(false)
@@ -56,6 +56,7 @@ export function MobileHeader() {
               <span>Browse IMDB</span>
             </a>
             <PlexSyncButton />
+            <StreamingRefreshButton />
             <AskClaudeLink />
             <Link
               href="/settings"

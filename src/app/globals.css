@@ -22,3 +22,11 @@
 body {
   @apply bg-amber-50 text-stone-900;
 }
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

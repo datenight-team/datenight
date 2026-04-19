@@ -107,7 +107,7 @@ export default function WatchlistPage() {
   const readyCount = movies.filter((m) => m.seerrStatus === 'available').length
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-6 max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-amber-900">Up Next</h1>
         {!loading && (
@@ -177,7 +177,7 @@ export default function WatchlistPage() {
                   ? 'Configure your streaming services in Settings'
                   : search || activeFilter
                   ? 'Try clearing the search or filter'
-                  : 'Add some from the sidebar'}
+                  : 'Tap ➕ below to add your first film'}
               </p>
             </div>
           )}

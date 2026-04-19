@@ -57,7 +57,7 @@ export default function AddMoviePage() {
   }
 
   return (
-    <div className="p-6 max-w-lg">
+    <div className="p-6 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold text-amber-900 mb-6">Add a Movie</h1>
 
       <div className="flex gap-2 mb-2">
@@ -66,6 +66,7 @@ export default function AddMoviePage() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handlePreview()}
+          inputMode="url"
           className="border-amber-300 focus:ring-amber-400"
         />
         <Button

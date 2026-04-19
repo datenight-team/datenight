@@ -24,14 +24,14 @@ export function MobileBottomNav() {
           href={href}
           className={cn(
             'flex flex-col items-center pt-2 pb-1 px-3 text-xs font-medium transition-colors min-w-0',
-            pathname === href ? 'text-amber-600' : 'text-amber-800'
+            pathname === href ? 'text-amber-700' : 'text-stone-500'
           )}
         >
           <span
             aria-hidden="true"
             className={cn(
               'text-xl mb-0.5 px-3 py-0.5 rounded-full',
-              pathname === href ? 'bg-amber-600' : ''
+              pathname === href ? 'bg-amber-700' : ''
             )}
           >
             {icon}
@@ -39,6 +39,14 @@ export function MobileBottomNav() {
           <span className={cn(pathname === href ? 'font-bold' : 'font-medium')}>
             {label}
           </span>
+          <span
+            aria-hidden="true"
+            // invisible keeps the dot in layout flow; prevents tab labels from shifting when active tab changes
+            className={cn(
+              'h-1 w-5 rounded-full mt-0.5 transition-colors',
+              pathname === href ? 'bg-amber-600' : 'invisible'
+            )}
+          />
         </Link>
       ))}
     </nav>
