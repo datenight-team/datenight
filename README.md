@@ -57,21 +57,13 @@ history and a third, wildcard recommendation to expand your horizons.
 
 ## Configuration
 
-All secrets are passed as environment variables. `make setup` creates
-`.env.local` from `.env.example` automatically. Edit it to fill in your API
-keys before starting the app. Use `.env` for the production secret delivery.
+App configuration is largely kept in the SQLite database. The only env var you need to get the app working is the path to the SQLite database.
+
+The first time you run the app, there's a config procedure that will walk you through the setup.
 
 | Variable | Description |
 |---|---|
 | `DATABASE_URL` | SQLite path — `file:./data/datenight.db` locally, `file:/app/data/datenight.db` in Docker |
-| `TMDB_API_KEY` | [TMDB API v3 key](https://developer.themoviedb.org/docs/getting-started) (free) |
-| `SEERR_URL` | Base URL of your Seerr instance, e.g. `http://seerr:5055` |
-| `SEERR_API_KEY` | Seerr API key (Settings → API Key) |
-| `PLEX_URL` | Base URL of your Plex server, e.g. `http://plex:32400` |
-| `PLEX_TOKEN` | [Plex authentication token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) |
-| `USER1_NAME` | Display name for the first user (default: `User 1`) |
-| `USER2_NAME` | Display name for the second user (default: `User 2`) |
-| `ANTHROPIC_API_KEY` | [Anthropic API key](https://console.anthropic.com/) — required for the Recommendations feature; the rest of the app works without it |
 
 ## Running Locally
 
@@ -134,13 +126,13 @@ make help       # full list of available commands
 Streaming data hasn't synced yet. It runs automatically on movie add and every 12 hours thereafter, but a fresh install or a newly added subscription won't have data until the first sync completes. Click **📡 Refresh Streaming** in the sidebar to trigger an immediate re-sync. Configure which services to track in Settings → Streaming.
 
 **Movies show "Not Requested" and never download**
-Seerr integration is failing silently. Check that `SEERR_URL` and `SEERR_API_KEY` are correct and that the container can reach Seerr. The sync job runs every 5 minutes — check logs: `make docker-logs`.
+Seerr integration is failing silently. Check that the Seerr URL and Seerr API key are correct in the Configuration section of the application and that the container can reach Seerr. The sync job runs every 5 minutes — check logs: `make docker-logs`.
 
 **Plex collection isn't updating**
-Check `PLEX_URL` and `PLEX_TOKEN`. The Plex token expires occasionally; get a fresh one from Settings → Troubleshooting → Get Token in the Plex UI. The collection syncs as part of the same 5-minute cron job as Seerr, or use the **🎭 Sync Plex** button in the sidebar for an immediate update.
+Check the Plex URL and the Plex token. The Plex token expires occasionally; get a fresh one from Settings → Troubleshooting → Get Token in the Plex UI. The collection syncs as part of the same 5-minute cron job as Seerr, or use the **🎭 Sync Plex** button in the sidebar for an immediate update.
 
 **Add Movie shows an error for a valid URL**
-The `TMDB_API_KEY` is likely missing or wrong. Test it: `curl "https://api.themoviedb.org/3/movie/550?api_key=YOUR_KEY"` — should return JSON, not an auth error.
+The Movie Database API key is likely missing or wrong. Test it: `curl "https://api.themoviedb.org/3/movie/550?api_key=YOUR_KEY"` — should return JSON, not an auth error.
 
 **The app starts but the database is empty after a restart**
 The data volume isn't persisted. With the named volume (`datenight-data`) in `docker-compose.yml`, data survives restarts automatically. If you switched from a bind mount, the old data is still at the bind mount path.
@@ -153,7 +145,7 @@ make docker-shell     # production — shell inside the running container
 ```
 
 **Recommendations page shows an error or returns nothing useful**
-Make sure `ANTHROPIC_API_KEY` is set and valid. The feature works best after you've rated a few films together — the more you've agreed on, the sharper the recommendations.
+Make sure the Anthropoic API key is set and valid. Note, you cannot use a long lived OAuth key on your plan for this. Anthropic will insist you use an API key that's attached to pay-as-go credits. The feature works best after you've rated a few films together — the more you've agreed on, the sharper the recommendations.
 
 **Container won't start / exits immediately**
 Run `make docker-logs`. The most common cause is a missing environment variable or a database migration failure on first boot.
