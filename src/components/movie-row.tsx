@@ -123,8 +123,8 @@ export function MovieRow({
                 src={`/streaming-logos/${p.providerId}.png`}
                 alt={p.providerName}
                 title={p.providerName}
-                width={16}
-                height={16}
+                width={20}
+                height={20}
                 className="rounded-sm object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none"
@@ -145,12 +145,12 @@ export function MovieRow({
         </div>
 
         {/* Actions — single row */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0 justify-end">
           {isStreamable ? (
             <>
               <Button
                 size="sm"
-                className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
                 onClick={() => onMarkWatched(movie)}
               >
                 Mark Watched
@@ -158,7 +158,7 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-6 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                className="text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
                 onClick={() => onForceDownload(movie.id)}
               >
                 Download Now
@@ -167,7 +167,7 @@ export function MovieRow({
           ) : movie.seerrStatus === "available" ? (
             <Button
               size="sm"
-              className="h-6 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+              className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
               onClick={() => onMarkWatched(movie)}
             >
               Mark Watched
@@ -177,7 +177,7 @@ export function MovieRow({
             <Button
               size="sm"
               variant="outline"
-              className="h-6 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
               onClick={() => onForceDownload(movie.id)}
             >
               Download Now
@@ -189,7 +189,7 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-6 text-xs border-red-300 text-red-600 hover:bg-red-50"
+                className="text-xs border-red-300 text-red-600 hover:bg-red-50"
                 onClick={handleConfirmRemove}
               >
                 Remove
@@ -197,7 +197,7 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-6 text-xs border-stone-200 text-stone-400 hover:bg-stone-50"
+                className="text-xs border-stone-200 text-stone-400 hover:bg-stone-50"
                 onClick={() => setConfirming(false)}
               >
                 Cancel
@@ -206,7 +206,7 @@ export function MovieRow({
           ) : (
             <button
               onClick={() => setConfirming(true)}
-              className="text-stone-300 hover:text-red-400 text-xs transition-colors"
+              className="w-9 h-9 flex items-center justify-center text-stone-300 hover:text-red-400 text-xs transition-colors"
               aria-label="Remove from list"
             >
               ✕
