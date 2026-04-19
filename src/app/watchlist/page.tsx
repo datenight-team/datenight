@@ -107,7 +107,7 @@ export default function WatchlistPage() {
   const readyCount = movies.filter((m) => m.seerrStatus === 'available').length
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-amber-900">Up Next</h1>
         {!loading && (
