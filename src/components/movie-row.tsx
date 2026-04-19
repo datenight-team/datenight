@@ -68,79 +68,81 @@ export function MovieRow({
 
   return (
     <>
-      <div className="flex items-center gap-3 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
-        {/* Position */}
-        <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0">
-          {position}
-        </span>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Position */}
+          <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0">
+            {position}
+          </span>
 
-        {/* Poster */}
-        <div className="flex-shrink-0">
-          <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="sm" />
-        </div>
-
-        {/* Info — title, year, pills, streaming */}
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-stone-900 text-sm truncate">
-            {movie.title}
-          </p>
-          <div className="text-stone-400 text-xs flex items-center gap-1.5">
-            <span>
-              {movie.year} · {formatRuntime(movie.runtime)}
-            </span>
-            {seerrUrl && (
-              <a
-                href={`${seerrUrl}/movie/${movie.tmdbId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-500 hover:text-amber-700 transition-colors"
-                title="View in Seerr"
-              >
-                ↗
-              </a>
-            )}
+          {/* Poster */}
+          <div className="flex-shrink-0">
+            <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="sm" />
           </div>
 
-          {/* Status pills + streaming info live here */}
-          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            {isStreamable && (
-              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
-                Streaming
+          {/* Info — title, year, pills, streaming */}
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-stone-900 text-sm truncate">
+              {movie.title}
+            </p>
+            <div className="text-stone-400 text-xs flex items-center gap-1.5">
+              <span>
+                {movie.year} · {formatRuntime(movie.runtime)}
               </span>
-            )}
-            {isCheckingStreaming && (
-              <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-500 border-amber-200">
-                Checking…
+              {seerrUrl && (
+                <a
+                  href={`${seerrUrl}/movie/${movie.tmdbId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-500 hover:text-amber-700 transition-colors"
+                  title="View in Seerr"
+                >
+                  ↗
+                </a>
+              )}
+            </div>
+
+            {/* Status pills + streaming info live here */}
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              {isStreamable && (
+                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
+                  Streaming
+                </span>
+              )}
+              {isCheckingStreaming && (
+                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-500 border-amber-200">
+                  Checking…
+                </span>
+              )}
+              <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${seerrPillClass}`}>
+                {SEERR_LABEL[movie.seerrStatus] ?? movie.seerrStatus}
               </span>
-            )}
-            <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${seerrPillClass}`}>
-              {SEERR_LABEL[movie.seerrStatus] ?? movie.seerrStatus}
-            </span>
-            {isStreamable && streamingProviders.map((p) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={p.providerId}
-                src={`/streaming-logos/${p.providerId}.png`}
-                alt={p.providerName}
-                title={p.providerName}
-                width={20}
-                height={20}
-                className="rounded-sm object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none"
-                }}
-              />
-            ))}
-            {isStreamable && streamingLink && (
-              <a
-                href={streamingLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded border border-amber-400 bg-white text-amber-700 px-2 py-0.5 text-xs font-medium hover:bg-amber-50 transition-colors"
-              >
-                Watch ↗
-              </a>
-            )}
+              {isStreamable && streamingProviders.map((p) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={p.providerId}
+                  src={`/streaming-logos/${p.providerId}.png`}
+                  alt={p.providerName}
+                  title={p.providerName}
+                  width={20}
+                  height={20}
+                  className="rounded-sm object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none"
+                  }}
+                />
+              ))}
+              {isStreamable && streamingLink && (
+                <a
+                  href={streamingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded border border-amber-400 bg-white text-amber-700 px-2 py-0.5 text-xs font-medium hover:bg-amber-50 transition-colors"
+                >
+                  Watch ↗
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
