@@ -152,18 +152,18 @@ export function MovieRow({
             <>
               <Button
                 size="sm"
-                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
-                onClick={() => onMarkWatched(movie)}
-              >
-                Mark Watched
-              </Button>
-              <Button
-                size="sm"
                 variant="outline"
                 className="text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
                 onClick={() => onForceDownload(movie.id)}
               >
                 Download Now
+              </Button>
+              <Button
+                size="sm"
+                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() => onMarkWatched(movie)}
+              >
+                Mark Watched
               </Button>
             </>
           ) : movie.seerrStatus === "available" ? (
