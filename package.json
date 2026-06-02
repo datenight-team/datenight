@@ -52,11 +52,11 @@
     "csv-parse": "^6.2.1",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.2.7",
     "jsdom": "^29.1.1",
     "postcss": "^8",
     "tailwindcss": "^4.2.4",
     "typescript": "^6",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   }
 }
