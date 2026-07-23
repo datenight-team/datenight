@@ -2,7 +2,10 @@
 import { prisma } from './db'
 import { getCriterionCatalog } from './criterion-catalog'
 import { searchByTitle, fetchPopularMovies } from './tmdb'
-import type { TmdbMovieDetails } from '@/types'
+import { Prisma } from '@prisma/client'
+import { otherUser } from './user-utils'
+import { syncMovieProviders } from './streaming'
+import type { TmdbMovieDetails, Movie, SwipeCandidateRecord, SwipeVote, User } from '@/types'
 
 export const REFILL_THRESHOLD = 5
 export const REFILL_BATCH_SIZE = 20
@@ -81,4 +84,89 @@ export async function refillCandidates(): Promise<number> {
     await prisma.swipeCandidate.createMany({ data: toInsert })
   }
   return toInsert.length
+}
+
+export async function getNextCandidateForUser(user: User): Promise<SwipeCandidateRecord | null> {
+  const pendingCount = await prisma.swipeCandidate.count({
+    where: { status: 'pending', swipes: { none: { user } } },
+  })
+  if (pendingCount < REFILL_THRESHOLD) {
+    await refillCandidates()
+  }
+
+  return (await findNextPending(user)) as unknown as SwipeCandidateRecord | null
+}
+
+function findNextPending(user: User) {
+  return prisma.swipeCandidate.findFirst({
+    where: { status: 'pending', swipes: { none: { user } } },
+    orderBy: { createdAt: 'asc' },
+  })
+}
+
+export type SwipeResult =
+  | { status: 'recorded' }
+  | { status: 'matched'; movie: Movie }
+  | { status: 'ignored' }
+
+export async function recordSwipe(
+  candidateId: number,
+  user: User,
+  vote: SwipeVote
+): Promise<SwipeResult> {
+  return prisma.$transaction(async (tx): Promise<SwipeResult> => {
+    const candidate = await tx.swipeCandidate.findUnique({ where: { id: candidateId } })
+    if (!candidate || candidate.status !== 'pending') {
+      return { status: 'ignored' }
+    }
+
+    await tx.swipe.create({ data: { candidateId, user, vote } })
+
+    if (vote === 'down') {
+      await tx.swipeCandidate.update({ where: { id: candidateId }, data: { status: 'dead' } })
+      return { status: 'recorded' }
+    }
+
+    const other = otherUser(user)
+    const otherSwipe = await tx.swipe.findUnique({
+      where: { candidateId_user: { candidateId, user: other } },
+    })
+    if (!otherSwipe || otherSwipe.vote !== 'up') {
+      return { status: 'recorded' }
+    }
+
+    const { _max } = await tx.movie.aggregate({ _max: { sortOrder: true } })
+    let movie
+    try {
+      movie = await tx.movie.create({
+        data: {
+          title: candidate.title,
+          year: candidate.year,
+          runtime: candidate.runtime,
+          description: candidate.description,
+          posterUrl: candidate.posterUrl,
+          imdbId: candidate.imdbId,
+          tmdbId: candidate.tmdbId,
+          sortOrder: (_max.sortOrder ?? 0) + 1,
+          matchedViaSwipe: true,
+        },
+      })
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        movie = await tx.movie.findUniqueOrThrow({ where: { tmdbId: candidate.tmdbId } })
+      } else {
+        throw err
+      }
+    }
+
+    await tx.swipeCandidate.update({ where: { id: candidateId }, data: { status: 'matched' } })
+    return { status: 'matched', movie: movie as unknown as Movie }
+  }).then((result: SwipeResult) => {
+    if (result.status === 'matched') {
+      syncMovieProviders(result.movie.id, result.movie.tmdbId).catch((err) =>
+        console.error('[match-night] Failed to sync providers for matched movie:', err)
+      )
+    }
+    return result
+  })
 }
