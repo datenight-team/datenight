@@ -70,13 +70,23 @@ clear.
 
 ## Candidate Sourcing
 
-Two feeder sources, both writing into `SwipeCandidate`:
+Two feeder sources, both writing into `SwipeCandidate`.
 
-1. **Criterion Collection** — paginate `criterion.com/shop/browse/films` listing pages,
-   scrape each film's slug + title from the listing HTML (reusing the `og:title` scrape
-   approach already present in `lookupCriterionSlug` in `src/lib/tmdb.ts`, adapted for a
-   listing page instead of a single film page). For each title found, resolve via the
-   existing `searchByTitle()` TMDB helper to get tmdbId/imdbId/year/description/posterUrl.
+> **Revision note (post-review):** the original design called for live-scraping
+> `criterion.com/shop/browse/films`. Testing during planning showed criterion.com sits
+> behind a Cloudflare JS challenge — a plain server-side `fetch` (to both listing pages
+> and individual film pages) returns a "Just a moment..." challenge page, not real HTML.
+> Live scraping the catalog is not viable. Source 1 below replaces the scrape with a
+> bundled static file.
+
+1. **Criterion Collection** — a static JSON file checked into the repo,
+   `data/criterion-catalog.json`, containing `{ title: string, year?: number }` entries
+   for the Criterion Collection catalog. This is compiled once (semi-)manually (e.g. from
+   a public spine-number list) and updated by hand periodically as Criterion adds titles
+   — there is no live fetch to criterion.com in this feature. For each entry not yet
+   resolved, resolve via the existing `searchByTitle()` TMDB helper to get
+   tmdbId/imdbId/year/description/posterUrl, then insert as a `SwipeCandidate` with
+   `source: "criterion"`.
 2. **TMDB popular** — page through TMDB's `/movie/popular` endpoint directly (new small
    helper alongside the existing functions in `src/lib/tmdb.ts`).
 
@@ -97,17 +107,16 @@ Settings — unlike the streaming region/services settings, there's no user-faci
 to tune these yet; revisit if usage shows otherwise.
 
 **Latency and failure handling**: a refill is a chain of sequential external HTTP calls
-(paginated Criterion listing fetch + per-title TMDB search, plus TMDB popular paging),
-so `GET /api/match-night/next` can stall for a few seconds exactly when the deck is
-running low — i.e. mid-swiping-session. Each external call gets a short timeout (e.g.
-5s) consistent with the rest of the app's "fail gracefully, return safe defaults"
-pattern (per CLAUDE.md). The two sources are independent: if the Criterion scrape fails
-or times out (most likely breakage point, since paginating the listing pages is a
-larger, more fragile scrape surface than the existing single-film `og:title` lookup),
-log and continue with whatever TMDB candidates were fetched rather than aborting the
-whole refill. If both sources fail or both are already exhausted, the refill simply adds
-zero candidates and the request falls through to the empty-state response — no retry
-loop within the request.
+(per-title TMDB search for unresolved Criterion catalog entries, plus TMDB popular
+paging), so `GET /api/match-night/next` can stall for a few seconds exactly when the
+deck is running low — i.e. mid-swiping-session. Each external call gets a short timeout
+(e.g. 5s) consistent with the rest of the app's "fail gracefully, return safe defaults"
+pattern (per CLAUDE.md). The two sources are independent: if TMDB resolution fails or
+times out for some Criterion catalog entries, log and skip those entries, continuing
+with whatever did resolve plus the TMDB-popular batch, rather than aborting the whole
+refill. If both sources fail or both are already exhausted, the refill simply adds zero
+candidates and the request falls through to the empty-state response — no retry loop
+within the request.
 
 ## Swipe Flow
 
