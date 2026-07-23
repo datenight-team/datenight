@@ -9,7 +9,7 @@ vi.mock('@/lib/config', () => ({
 }))
 
 import { getConfig } from '@/lib/config'
-const { findByImdbId, searchByTitle, lookupCriterionSlug, fetchWatchProviders, fetchProviderList } = await import('@/lib/tmdb')
+const { findByImdbId, searchByTitle, lookupCriterionSlug, fetchWatchProviders, fetchProviderList, fetchPopularMovies } = await import('@/lib/tmdb')
 
 const mockConfig = {
   tmdbApiKey: 'test-key',
@@ -221,5 +221,43 @@ describe('fetchProviderList', () => {
   it('returns empty array when TMDB key is not configured', async () => {
     vi.mocked(getConfig).mockResolvedValue({ ...mockConfig, tmdbApiKey: '' })
     expect(await fetchProviderList('US')).toEqual([])
+  })
+})
+
+describe('fetchPopularMovies', () => {
+  beforeEach(() => {
+    mockFetch.mockReset()
+    vi.mocked(getConfig).mockResolvedValue(mockConfig)
+  })
+
+  it('resolves full details for each popular result', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ id: 345911 }] }),
+      })
+      .mockResolvedValueOnce({ ok: true, json: async () => detailsResponse })
+
+    const result = await fetchPopularMovies(1)
+    expect(result).toHaveLength(1)
+    expect(result[0].title).toBe('Seven Samurai')
+  })
+
+  it('returns empty array on fetch error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false })
+    expect(await fetchPopularMovies(1)).toEqual([])
+  })
+
+  it('filters out results TMDB details couldn\'t resolve', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ results: [{ id: 1 }, { id: 2 }] }),
+      })
+      .mockResolvedValueOnce({ ok: false }) // details for id 1 fail
+      .mockResolvedValueOnce({ ok: true, json: async () => detailsResponse }) // id 2 succeeds
+
+    const result = await fetchPopularMovies(1)
+    expect(result).toHaveLength(1)
   })
 })

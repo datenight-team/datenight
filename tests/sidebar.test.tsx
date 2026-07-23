@@ -20,6 +20,7 @@ describe('Sidebar', () => {
     expect(screen.getByRole('link', { name: /watched/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /add movie/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /recommend/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /match night/i })).toBeInTheDocument()
   })
 
   it('does not render Browse Criterion or Browse IMDB in the utility footer', () => {

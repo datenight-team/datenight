@@ -9,12 +9,13 @@ vi.mock('next/navigation', () => ({
 import { MobileBottomNav } from '@/components/mobile-bottom-nav'
 
 describe('MobileBottomNav', () => {
-  it('renders all four navigation tabs', () => {
+  it('renders all five navigation tabs', () => {
     render(<MobileBottomNav />)
     expect(screen.getByText('List')).toBeInTheDocument()
     expect(screen.getByText('Watched')).toBeInTheDocument()
     expect(screen.getByText('Add')).toBeInTheDocument()
     expect(screen.getByText('Recs')).toBeInTheDocument()
+    expect(screen.getByText('Match')).toBeInTheDocument()
   })
 
   it('links to the correct routes', () => {
@@ -23,6 +24,7 @@ describe('MobileBottomNav', () => {
     expect(screen.getByRole('link', { name: /watched/i })).toHaveAttribute('href', '/watched')
     expect(screen.getByRole('link', { name: /add/i })).toHaveAttribute('href', '/add')
     expect(screen.getByRole('link', { name: /recs/i })).toHaveAttribute('href', '/recommendations')
+    expect(screen.getByRole('link', { name: /match/i })).toHaveAttribute('href', '/match-night')
   })
 
   it('does not include Settings in the bottom nav tabs', () => {

@@ -9,6 +9,7 @@ const navItems = [
   { href: '/watchlist', label: 'Watch List', icon: '📋' },
   { href: '/watched', label: 'Watched', icon: '✅' },
   { href: '/add', label: 'Add Movie', icon: '➕' },
+  { href: '/match-night', label: 'Match Night', icon: '💕' },
   { href: '/recommendations', label: 'Recommend', icon: '🎯' },
 ]
 

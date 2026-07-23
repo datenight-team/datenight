@@ -13,6 +13,10 @@ export type User = 'user1' | 'user2'
 
 export type RatingValue = 'up' | 'down'
 
+export type SwipeSource = 'criterion' | 'tmdb'
+export type SwipeStatus = 'pending' | 'dead' | 'matched'
+export type SwipeVote = 'up' | 'down'
+
 export interface StreamingProvider {
   id: number
   movieId: number
@@ -40,6 +44,7 @@ export interface Movie {
   createdAt: Date | string
   streamingLastChecked?: Date | string | null
   streamingLink?: string | null
+  matchedViaSwipe: boolean
   ratings?: Rating[]
   streamingProviders?: StreamingProvider[]
 }
@@ -51,6 +56,28 @@ export interface Rating {
   rating: RatingValue
   quote: string
   submittedAt: Date | string
+}
+
+export interface SwipeCandidateRecord {
+  id: number
+  tmdbId: number
+  imdbId: string
+  title: string
+  year: number
+  runtime: number
+  description: string
+  posterUrl: string
+  source: SwipeSource
+  status: SwipeStatus
+  createdAt: Date | string
+}
+
+export interface Swipe {
+  id: number
+  candidateId: number
+  user: User
+  vote: SwipeVote
+  swipedAt: Date | string
 }
 
 export interface TmdbMovieDetails {

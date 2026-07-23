@@ -27,6 +27,7 @@ model Movie {
   createdAt            DateTime            @default(now())
   streamingLastChecked DateTime?
   streamingLink        String?
+  matchedViaSwipe      Boolean             @default(false)
   ratings              Rating[]
   streamingProviders   StreamingProvider[]
 }
@@ -39,6 +40,32 @@ model StreamingProvider {
   movie        Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
 
   @@unique([movieId, providerId])
+}
+
+model SwipeCandidate {
+  id          Int      @id @default(autoincrement())
+  tmdbId      Int      @unique
+  imdbId      String
+  title       String
+  year        Int
+  runtime     Int
+  description String
+  posterUrl   String
+  source      String // "criterion" | "tmdb"
+  status      String   @default("pending") // pending | dead | matched
+  createdAt   DateTime @default(now())
+  swipes      Swipe[]
+}
+
+model Swipe {
+  id          Int            @id @default(autoincrement())
+  candidateId Int
+  user        String
+  vote        String // "up" | "down"
+  swipedAt    DateTime       @default(now())
+  candidate   SwipeCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateId, user])
 }
 
 model Rating {

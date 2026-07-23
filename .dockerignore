@@ -6,4 +6,5 @@ node_modules
 .env*.local
 !.env.example
 data
+!data/criterion-catalog.json
 docs

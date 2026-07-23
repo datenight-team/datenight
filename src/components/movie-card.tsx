@@ -121,6 +121,11 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
               </span>
             )}
           </div>
+          {movie.matchedViaSwipe && (
+            <span className="mt-1 inline-block rounded-full border px-2 py-0.5 text-xs font-semibold bg-pink-50 text-pink-600 border-pink-200">
+              It&apos;s a match! 🎉
+            </span>
+          )}
         </div>
       </button>
 

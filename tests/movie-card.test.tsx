@@ -109,3 +109,17 @@ describe('MovieCard cleanup button', () => {
     await waitFor(() => expect(screen.getByText("Alice's verdict")).toBeInTheDocument())
   })
 })
+
+describe('MovieCard match badge', () => {
+  beforeEach(() => mockFetch.mockReset())
+
+  it('shows the match badge when matchedViaSwipe is true', () => {
+    render(<MovieCard movie={makeMovie({ matchedViaSwipe: true })} userNames={userNames} />)
+    expect(screen.getByText(/it's a match/i)).toBeInTheDocument()
+  })
+
+  it('does not show the match badge for regularly-added movies', () => {
+    render(<MovieCard movie={makeMovie({ matchedViaSwipe: false })} userNames={userNames} />)
+    expect(screen.queryByText(/it's a match/i)).not.toBeInTheDocument()
+  })
+})
