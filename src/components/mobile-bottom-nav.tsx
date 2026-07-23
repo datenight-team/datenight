@@ -7,6 +7,7 @@ const tabs = [
   { href: '/watchlist', label: 'List',     icon: '📋' },
   { href: '/watched',   label: 'Watched',  icon: '✅' },
   { href: '/add',       label: 'Add',      icon: '➕' },
+  { href: '/match-night', label: 'Match',  icon: '💕' },
   { href: '/recommendations', label: 'Recs', icon: '🎯' },
 ]
 
