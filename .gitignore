@@ -41,6 +41,7 @@ next-env.d.ts
 
 # local data
 data/
+!data/criterion-catalog.json
 /*.csv
 
 # runtime-cached streaming service logos (downloaded from TMDB at runtime)
