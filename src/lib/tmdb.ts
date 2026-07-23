@@ -4,9 +4,14 @@ import { getConfig } from './config'
 
 const BASE = 'https://api.themoviedb.org/3'
 const IMG_BASE = 'https://image.tmdb.org/t/p/w500'
+const FETCH_TIMEOUT_MS = 5000
+
+function fetchWithTimeout(url: string): Promise<Response> {
+  return fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+}
 
 async function fetchDetails(tmdbId: number, key: string): Promise<TmdbMovieDetails | null> {
-  const res = await fetch(`${BASE}/movie/${tmdbId}?api_key=${key}`)
+  const res = await fetchWithTimeout(`${BASE}/movie/${tmdbId}?api_key=${key}`)
   if (!res.ok) return null
   const m = await res.json()
   return {
@@ -40,7 +45,7 @@ export async function searchByTitle(
 ): Promise<TmdbMovieDetails | null> {
   const { tmdbApiKey } = await getConfig()
   const yearParam = year ? `&year=${year}` : ''
-  const res = await fetch(
+  const res = await fetchWithTimeout(
     `${BASE}/search/movie?api_key=${tmdbApiKey}&query=${encodeURIComponent(title)}${yearParam}`
   )
   if (!res.ok) return null
@@ -123,4 +128,14 @@ export async function fetchProviderList(region: string): Promise<WatchProvider[]
       logoPath: p.logo_path,
     })
   )
+}
+
+export async function fetchPopularMovies(page: number): Promise<TmdbMovieDetails[]> {
+  const { tmdbApiKey } = await getConfig()
+  const res = await fetchWithTimeout(`${BASE}/movie/popular?api_key=${tmdbApiKey}&page=${page}`)
+  if (!res.ok) return []
+  const data = await res.json()
+  const hits = (data.results ?? []) as Array<{ id: number }>
+  const details = await Promise.all(hits.map((h) => fetchDetails(h.id, tmdbApiKey)))
+  return details.filter((d): d is TmdbMovieDetails => d !== null)
 }
