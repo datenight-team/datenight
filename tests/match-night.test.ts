@@ -113,6 +113,41 @@ describe('refillCandidates', () => {
     })
   })
 
+  it('interleaves criterion and tmdb candidates instead of blocking them by source', async () => {
+    vi.mocked(getCriterionCatalog).mockReturnValue([
+      { title: 'Criterion A' }, { title: 'Criterion B' }, { title: 'Criterion C' },
+      { title: 'Criterion D' }, { title: 'Criterion E' },
+    ])
+    vi.mocked(searchByTitle)
+      .mockResolvedValueOnce(tmdbDetails({ tmdbId: 1 }))
+      .mockResolvedValueOnce(tmdbDetails({ tmdbId: 2 }))
+      .mockResolvedValueOnce(tmdbDetails({ tmdbId: 3 }))
+      .mockResolvedValueOnce(tmdbDetails({ tmdbId: 4 }))
+      .mockResolvedValueOnce(tmdbDetails({ tmdbId: 5 }))
+    vi.mocked(fetchPopularMovies).mockResolvedValue([
+      tmdbDetails({ tmdbId: 101 }), tmdbDetails({ tmdbId: 102 }), tmdbDetails({ tmdbId: 103 }),
+      tmdbDetails({ tmdbId: 104 }), tmdbDetails({ tmdbId: 105 }),
+    ])
+
+    // Deterministic Fisher-Yates: forcing every draw to 0 still produces a
+    // real permutation (not the identity), so this exercises real shuffle
+    // logic without relying on chance to avoid a flaky assertion.
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+    try {
+      await refillCandidates()
+    } finally {
+      randomSpy.mockRestore()
+    }
+
+    const inserted = vi.mocked(prisma.swipeCandidate.createMany).mock.calls[0][0].data as Array<{ source: string }>
+    expect(inserted).toHaveLength(10)
+    // Insertion order shouldn't be strictly "all criterion, then all tmdb" —
+    // some tmdb candidate must appear before the last criterion candidate.
+    const lastCriterionIndex = inserted.map((c) => c.source).lastIndexOf('criterion')
+    const firstTmdbIndex = inserted.map((c) => c.source).indexOf('tmdb')
+    expect(firstTmdbIndex).toBeLessThan(lastCriterionIndex)
+  })
+
   it('persists the TMDB popular page cursor after a refill', async () => {
     vi.mocked(getCriterionCatalog).mockReturnValue([])
     vi.mocked(prisma.setting.findUnique).mockResolvedValue({ key: 'match_night_tmdb_popular_page', value: '3' } as any)
@@ -142,7 +177,7 @@ describe('getNextCandidateForUser', () => {
     })
     expect(prisma.swipeCandidate.findFirst).toHaveBeenCalledWith({
       where: { status: 'pending', swipes: { none: { user: 'user1' } } },
-      orderBy: { createdAt: 'asc' },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     })
     expect(getCriterionCatalog).not.toHaveBeenCalled()
   })

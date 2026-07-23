@@ -18,6 +18,15 @@ interface NewCandidate extends TmdbMovieDetails {
   source: 'criterion' | 'tmdb'
 }
 
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
 async function getCursor(key: string): Promise<number> {
   const row = await prisma.setting.findUnique({ where: { key } })
   return row ? parseInt(row.value, 10) || 0 : 0
@@ -81,7 +90,7 @@ export async function refillCandidates(): Promise<number> {
   await setCursor(TMDB_PAGE_CURSOR_KEY, page)
 
   if (toInsert.length > 0) {
-    await prisma.swipeCandidate.createMany({ data: toInsert })
+    await prisma.swipeCandidate.createMany({ data: shuffle(toInsert) })
   }
   return toInsert.length
 }
@@ -100,7 +109,7 @@ export async function getNextCandidateForUser(user: User): Promise<SwipeCandidat
 function findNextPending(user: User) {
   return prisma.swipeCandidate.findFirst({
     where: { status: 'pending', swipes: { none: { user } } },
-    orderBy: { createdAt: 'asc' },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
   })
 }
 
