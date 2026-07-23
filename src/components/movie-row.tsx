@@ -104,6 +104,11 @@ export function MovieRow({
 
             {/* Status pills + streaming info live here */}
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              {movie.matchedViaSwipe && (
+                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-pink-50 text-pink-600 border-pink-200">
+                  It&apos;s a match! 🎉
+                </span>
+              )}
               {isStreamable && (
                 <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
                   Streaming

@@ -32,6 +32,7 @@ function makeMovie(overrides: Partial<Movie> = {}): Movie {
     createdAt: new Date().toISOString(),
     streamingLastChecked: new Date().toISOString(),
     streamingLink: null,
+    matchedViaSwipe: false,
     ratings: [],
     streamingProviders: [],
     ...overrides,
@@ -114,5 +115,19 @@ describe('MovieRow layout', () => {
     const watchLink = screen.getByRole('link', { name: /watch/i })
     expect(watchLink).not.toHaveClass('bg-stone-800')
     expect(watchLink).toHaveClass('border-amber-400')
+  })
+})
+
+describe('MovieRow match badge', () => {
+  beforeEach(() => mockFetch.mockReset())
+
+  it('shows the match badge when matchedViaSwipe is true', () => {
+    render(<MovieRow movie={makeMovie({ matchedViaSwipe: true })} {...defaultProps} />)
+    expect(screen.getByText(/it's a match/i)).toBeInTheDocument()
+  })
+
+  it('does not show the match badge for regularly-added movies', () => {
+    render(<MovieRow movie={makeMovie({ matchedViaSwipe: false })} {...defaultProps} />)
+    expect(screen.queryByText(/it's a match/i)).not.toBeInTheDocument()
   })
 })
