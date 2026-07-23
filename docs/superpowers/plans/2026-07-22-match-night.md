@@ -1368,8 +1368,8 @@ describe('MatchNightPage', () => {
     )
   })
 
-  it('shows a match banner when the swipe result is a match', async () => {
-    mockFetch.mockImplementation((url: string, opts?: any) => {
+  it('requests the next card after a match, without showing any in-page match feedback', async () => {
+    mockFetch.mockImplementation((url: string) => {
       if (url.includes('/api/user-names')) return jsonResponse({ user1: 'Ian', user2: 'Krista' })
       if (url.includes('/api/match-night/next')) return jsonResponse({ candidate })
       if (url.includes('/api/match-night/swipe')) return jsonResponse({ status: 'matched', movie: { id: 10 } })
@@ -1380,7 +1380,10 @@ describe('MatchNightPage', () => {
     fireEvent.click(screen.getByText('Ian'))
     await waitFor(() => screen.getByText('Seven Samurai'))
     fireEvent.click(screen.getByRole('button', { name: /thumbs up/i }))
-    await waitFor(() => expect(screen.getByText(/it's a match/i)).toBeInTheDocument())
+    await waitFor(() =>
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/match-night/next?user=user1'))
+    )
+    expect(screen.queryByText(/it's a match/i)).not.toBeInTheDocument()
   })
 
   it('shows an empty state when there is no next candidate', async () => {
@@ -1421,7 +1424,6 @@ export default function MatchNightPage() {
   const [candidate, setCandidate] = useState<SwipeCandidateRecord | null>(null)
   const [loading, setLoading] = useState(false)
   const [voting, setVoting] = useState(false)
-  const [justMatched, setJustMatched] = useState(false)
 
   useEffect(() => {
     fetch('/api/user-names')
@@ -1449,15 +1451,12 @@ export default function MatchNightPage() {
   const handleVote = async (vote: SwipeVote) => {
     if (!currentUser || !candidate) return
     setVoting(true)
-    setJustMatched(false)
     try {
-      const res = await fetch('/api/match-night/swipe', {
+      await fetch('/api/match-night/swipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ candidateId: candidate.id, user: currentUser, vote }),
       })
-      const data = await res.json()
-      if (data.status === 'matched') setJustMatched(true)
       await loadNext(currentUser)
     } finally {
       setVoting(false)
@@ -1488,12 +1487,6 @@ export default function MatchNightPage() {
     <div className="p-6 max-w-md mx-auto">
       <h1 className="text-2xl font-bold text-amber-900 mb-2 text-center">Match Night 💕</h1>
       <p className="text-xs text-stone-500 text-center mb-6">Swiping as {userNames[currentUser]}</p>
-
-      {justMatched && (
-        <p className="text-center text-green-700 bg-green-50 border border-green-200 rounded-lg py-2 mb-4 text-sm font-medium">
-          It&apos;s a match! 🎉 Added to your watchlist.
-        </p>
-      )}
 
       {loading ? (
         <div className="text-center text-amber-600 mt-16 animate-pulse">Loading next film…</div>
@@ -1748,7 +1741,7 @@ Run: `npm run dev`, then in a browser:
 1. Set `TMDB_API_KEY` in `.env.local` to a real key (required — Match Night can't resolve any candidates without it).
 2. Visit `/match-night`, pick a user, confirm a card loads with poster/title/year/description.
 3. Thumbs-down it, confirm a new card loads.
-4. Thumbs-up a card, switch users (reload page, pick the other name), find the same title (deck order is FIFO so it should reappear for the other user), thumbs-up it too, confirm the "It's a match!" banner appears.
+4. Thumbs-up a card, switch users (reload page, pick the other name), find the same title (deck order is FIFO so it should reappear for the other user), thumbs-up it too.
 5. Visit `/watchlist`, confirm the matched movie appears with the "It's a match! 🎉" badge.
 
 No commit for this task — it's verification only. If any step fails, fix the underlying issue and re-run from Step 1.
