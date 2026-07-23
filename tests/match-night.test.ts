@@ -99,6 +99,20 @@ describe('refillCandidates', () => {
     })
   })
 
+  it('skips a TMDB result with an empty imdbId', async () => {
+    vi.mocked(getCriterionCatalog).mockReturnValue([])
+    vi.mocked(fetchPopularMovies).mockResolvedValue([
+      tmdbDetails({ tmdbId: 99, imdbId: '' }),
+      tmdbDetails({ tmdbId: 100, imdbId: 'tt0000100' }),
+    ])
+
+    const count = await refillCandidates()
+    expect(count).toBe(1)
+    expect(prisma.swipeCandidate.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({ tmdbId: 100, source: 'tmdb' })],
+    })
+  })
+
   it('persists the TMDB popular page cursor after a refill', async () => {
     vi.mocked(getCriterionCatalog).mockReturnValue([])
     vi.mocked(prisma.setting.findUnique).mockResolvedValue({ key: 'match_night_tmdb_popular_page', value: '3' } as any)

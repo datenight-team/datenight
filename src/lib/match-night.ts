@@ -56,7 +56,7 @@ export async function refillCandidates(): Promise<number> {
     const entry = catalog[criterionCursor]
     criterionCursor++
     const details = await searchByTitle(entry.title, entry.year).catch(() => null)
-    if (details && !existingTmdbIds.has(details.tmdbId)) {
+    if (details && details.imdbId !== '' && !existingTmdbIds.has(details.tmdbId)) {
       existingTmdbIds.add(details.tmdbId)
       toInsert.push({ ...details, source: 'criterion' })
     }
@@ -72,7 +72,7 @@ export async function refillCandidates(): Promise<number> {
     pagesFetched++
     page++
     for (const details of results) {
-      if (existingTmdbIds.has(details.tmdbId)) continue
+      if (details.imdbId === '' || existingTmdbIds.has(details.tmdbId)) continue
       existingTmdbIds.add(details.tmdbId)
       toInsert.push({ ...details, source: 'tmdb' })
       if (toInsert.length >= REFILL_BATCH_SIZE) break
