@@ -1,6 +1,7 @@
 // src/app/watchlist/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Clapperboard } from 'lucide-react'
 import { MovieRow } from '@/components/movie-row'
 import { RatingDialog } from '@/components/rating-dialog'
 import { FilterBar } from '@/components/filter-bar'
@@ -109,9 +110,9 @@ export default function WatchlistPage() {
   return (
     <div className="p-6 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-amber-900">Up Next</h1>
+        <h1 className="text-2xl font-display font-bold text-foreground">Up Next</h1>
         {!loading && (
-          <span className="text-xs bg-amber-100 text-amber-700 border border-amber-300 px-3 py-1 rounded-full">
+          <span className="text-xs bg-card text-muted-foreground border border-border px-3 py-1 rounded-full">
             {movies.length} movies · {readyCount} ready
           </span>
         )}
@@ -122,15 +123,15 @@ export default function WatchlistPage() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 bg-white border border-amber-100 rounded-xl px-4 py-3 animate-pulse"
+              className="flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3 animate-pulse"
             >
-              <div className="w-5 h-5 bg-amber-100 rounded" />
-              <div className="w-9 h-14 bg-amber-100 rounded flex-shrink-0" />
+              <div className="w-5 h-5 bg-muted rounded" />
+              <div className="w-9 h-14 bg-muted rounded flex-shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 bg-amber-100 rounded w-2/3" />
-                <div className="h-2 bg-amber-50 rounded w-1/3" />
+                <div className="h-3 bg-muted rounded w-2/3" />
+                <div className="h-2 bg-muted rounded w-1/3" />
               </div>
-              <div className="w-16 h-5 bg-amber-100 rounded-full" />
+              <div className="w-16 h-5 bg-muted rounded-full" />
             </div>
           ))}
         </div>
@@ -144,7 +145,7 @@ export default function WatchlistPage() {
             onButtonChange={setActiveFilter}
             extraPills={
               streamingServiceIds.length > 0
-                ? [{ label: '▶ Streamable', active: streamableOnly, onToggle: () => setStreamableOnly((v) => !v) }]
+                ? [{ label: 'Streamable', active: streamableOnly, onToggle: () => setStreamableOnly((v) => !v) }]
                 : undefined
             }
           />
@@ -169,15 +170,15 @@ export default function WatchlistPage() {
           </div>
 
           {filteredMovies.length === 0 && (
-            <div className="text-center text-amber-600 mt-16">
-              <div className="text-5xl mb-4">🎬</div>
-              <p className="font-medium">{search || activeFilter ? 'No movies match your filter' : 'No movies yet'}</p>
-              <p className="text-sm text-amber-500 mt-1">
+            <div className="text-center text-muted-foreground mt-16">
+              <Clapperboard className="w-10 h-10 mx-auto mb-4" aria-hidden="true" />
+              <p className="font-medium text-foreground">{search || activeFilter ? 'No movies match your filter' : 'No movies yet'}</p>
+              <p className="text-sm mt-1">
                 {streamableOnly
                   ? 'Configure your streaming services in Settings'
                   : search || activeFilter
                   ? 'Try clearing the search or filter'
-                  : 'Tap ➕ below to add your first film'}
+                  : 'Tap + below to add your first film'}
               </p>
             </div>
           )}

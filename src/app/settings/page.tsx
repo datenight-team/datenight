@@ -12,8 +12,8 @@ export default async function SettingsPage() {
 
   return (
     <div className="p-6 max-w-2xl">
-      <h1 className="text-2xl font-bold text-amber-900 mb-1">Settings</h1>
-      <p className="text-sm text-amber-600 mb-8">Configure your Date Night app.</p>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-1">Settings</h1>
+      <p className="text-sm text-muted-foreground mb-8">Configure your Date Night app.</p>
       <SettingsForm initialValues={initialValues} />
     </div>
   )

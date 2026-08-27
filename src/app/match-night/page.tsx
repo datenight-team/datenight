@@ -1,6 +1,6 @@
-// src/app/match-night/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Heart, Clapperboard } from 'lucide-react'
 import { MatchNightCard } from '@/components/match-night-card'
 import { Button } from '@/components/ui/button'
 import { USER_KEYS } from '@/lib/user-utils'
@@ -54,13 +54,15 @@ export default function MatchNightPage() {
   if (!currentUser) {
     return (
       <div className="p-6 max-w-md mx-auto text-center">
-        <h1 className="text-2xl font-bold text-amber-900 mb-6">Match Night 💕</h1>
-        <p className="text-sm text-stone-600 mb-4">Who&apos;s swiping?</p>
+        <h1 className="text-2xl font-display font-bold text-foreground mb-6 inline-flex items-center gap-2">
+          Match Night <Heart className="w-5 h-5 text-primary" aria-hidden="true" />
+        </h1>
+        <p className="text-sm text-muted-foreground mb-4">Who&apos;s swiping?</p>
         <div className="space-y-3">
           {USER_KEYS.map((user) => (
             <Button
               key={user}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+              className="w-full"
               onClick={() => handleSelectUser(user)}
             >
               {userNames[user]}
@@ -73,18 +75,20 @@ export default function MatchNightPage() {
 
   return (
     <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-amber-900 mb-2 text-center">Match Night 💕</h1>
-      <p className="text-xs text-stone-500 text-center mb-6">Swiping as {userNames[currentUser]}</p>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-2 text-center inline-flex items-center justify-center gap-2 w-full">
+        Match Night <Heart className="w-5 h-5 text-primary" aria-hidden="true" />
+      </h1>
+      <p className="text-xs text-muted-foreground text-center mb-6">Swiping as {userNames[currentUser]}</p>
 
       {loading ? (
-        <div className="text-center text-amber-600 mt-16 animate-pulse">Loading next film…</div>
+        <div className="text-center text-muted-foreground mt-16 animate-pulse">Loading next film…</div>
       ) : candidate ? (
         <MatchNightCard candidate={candidate} voting={voting} onVote={handleVote} />
       ) : (
-        <div className="text-center text-amber-600 mt-16">
-          <div className="text-5xl mb-4">🎬</div>
-          <p className="font-medium">You&apos;re all caught up!</p>
-          <p className="text-sm text-amber-500 mt-1">Check back later for more films to swipe on.</p>
+        <div className="text-center text-muted-foreground mt-16">
+          <Clapperboard className="w-10 h-10 mx-auto mb-4" aria-hidden="true" />
+          <p className="font-medium text-foreground">You&apos;re all caught up!</p>
+          <p className="text-sm mt-1">Check back later for more films to swipe on.</p>
         </div>
       )}
     </div>

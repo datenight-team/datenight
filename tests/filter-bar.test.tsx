@@ -78,10 +78,10 @@ describe('FilterBar', () => {
         buttons={buttons}
         activeButton={null}
         onButtonChange={vi.fn()}
-        extraPills={[{ label: '▶ Streamable', active: false, onToggle }]}
+        extraPills={[{ label: 'Streamable', active: false, onToggle }]}
       />
     )
-    const streamablePill = screen.getByText('▶ Streamable')
+    const streamablePill = screen.getByText('Streamable')
     expect(streamablePill).toBeInTheDocument()
     expect(streamablePill.closest('div')).toBe(
       screen.getByText('All').closest('div')
@@ -97,10 +97,10 @@ describe('FilterBar', () => {
         buttons={buttons}
         activeButton={null}
         onButtonChange={vi.fn()}
-        extraPills={[{ label: '▶ Streamable', active: false, onToggle }]}
+        extraPills={[{ label: 'Streamable', active: false, onToggle }]}
       />
     )
-    fireEvent.click(screen.getByText('▶ Streamable'))
+    fireEvent.click(screen.getByText('Streamable'))
     expect(onToggle).toHaveBeenCalledOnce()
   })
 
@@ -112,9 +112,9 @@ describe('FilterBar', () => {
         buttons={buttons}
         activeButton={null}
         onButtonChange={vi.fn()}
-        extraPills={[{ label: '▶ Streamable', active: true, onToggle: vi.fn() }]}
+        extraPills={[{ label: 'Streamable', active: true, onToggle: vi.fn() }]}
       />
     )
-    expect(screen.getByText('▶ Streamable')).toHaveClass('bg-green-500')
+    expect(screen.getByText('Streamable').closest('button')).toHaveClass('bg-success')
   })
 })

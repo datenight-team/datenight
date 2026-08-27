@@ -2,25 +2,83 @@
 @config "../../tailwind.config.ts";
 
 :root {
-  --background: 45 60% 97%;
-  --foreground: 30 15% 12%;
-  --card: 0 0% 100%;
-  --card-foreground: 30 15% 12%;
-  --primary: 37 91% 45%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 37 80% 95%;
-  --secondary-foreground: 30 50% 30%;
-  --muted: 37 30% 92%;
-  --muted-foreground: 30 20% 45%;
-  --accent: 37 80% 90%;
-  --accent-foreground: 30 50% 25%;
-  --border: 37 60% 83%;
-  --ring: 37 91% 45%;
-  --radius: 0.75rem;
+  --background: oklch(97% 0.018 75);
+  --foreground: oklch(24% 0.02 50);
+  --card: oklch(99% 0.007 75);
+  --card-foreground: oklch(24% 0.02 50);
+  --popover: oklch(99% 0.007 75);
+  --popover-foreground: oklch(24% 0.02 50);
+  --primary: oklch(58% 0.15 55);
+  --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(95.5% 0.02 72);
+  --secondary-foreground: oklch(24% 0.02 50);
+  --muted: oklch(94% 0.008 70);
+  --muted-foreground: oklch(46% 0.02 50);
+  --accent: oklch(95.5% 0.02 72);
+  --accent-foreground: oklch(24% 0.02 50);
+  --destructive: oklch(60% 0.13 25);
+  --destructive-foreground: oklch(100% 0 0);
+  --border: oklch(89% 0.02 68);
+  --input: oklch(89% 0.02 68);
+  --ring: oklch(58% 0.15 55);
+  --radius: 0.875rem;
+
+  --rose: oklch(60% 0.13 25);
+  --rose-bg: oklch(94% 0.04 25);
+  --success: oklch(54% 0.11 150);
+  --success-bg: oklch(93% 0.045 150);
+  --queued: oklch(50% 0.09 255);
+  --queued-bg: oklch(93% 0.03 255);
+  --downloading: oklch(52% 0.1 55);
+  --downloading-bg: oklch(94% 0.045 70);
+  --violet: oklch(56% 0.14 300);
+  --violet-bg: oklch(93% 0.035 300);
+  --header: oklch(24% 0.02 50);
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.dark {
+  --background: oklch(22% 0.014 55);
+  --foreground: oklch(93% 0.01 70);
+  --card: oklch(27% 0.016 55);
+  --card-foreground: oklch(93% 0.01 70);
+  --popover: oklch(27% 0.016 55);
+  --popover-foreground: oklch(93% 0.01 70);
+  --primary: oklch(62% 0.15 55);
+  --primary-foreground: oklch(100% 0 0);
+  --secondary: oklch(32% 0.018 55);
+  --secondary-foreground: oklch(93% 0.01 70);
+  --muted: oklch(33% 0.012 55);
+  --muted-foreground: oklch(65% 0.015 60);
+  --accent: oklch(32% 0.018 55);
+  --accent-foreground: oklch(93% 0.01 70);
+  --destructive: oklch(58% 0.16 20);
+  --destructive-foreground: oklch(100% 0 0);
+  --border: oklch(37% 0.02 55);
+  --input: oklch(37% 0.02 55);
+  --ring: oklch(62% 0.15 55);
+
+  --rose: oklch(75% 0.13 25);
+  --rose-bg: oklch(32% 0.06 25);
+  --success: oklch(72% 0.11 150);
+  --success-bg: oklch(30% 0.05 150);
+  --queued: oklch(78% 0.08 255);
+  --queued-bg: oklch(30% 0.04 255);
+  --downloading: oklch(78% 0.09 55);
+  --downloading-bg: oklch(32% 0.05 70);
+  --violet: oklch(76% 0.12 300);
+  --violet-bg: oklch(30% 0.05 300);
+  --header: oklch(16% 0.014 55);
 }
 
 body {
-  @apply bg-amber-50 text-stone-900;
+  @apply bg-background text-foreground font-sans;
+}
+
+h1, h2, .font-display {
+  font-family: var(--font-display);
 }
 
 .scrollbar-hide {

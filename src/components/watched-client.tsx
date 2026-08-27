@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { CheckCircle2 } from 'lucide-react'
 import { FilterBar } from './filter-bar'
 import { MovieCard } from './movie-card'
 import type { Movie, User } from '@/types'
@@ -17,10 +18,10 @@ export function WatchedClient({ movies, userNames, seerrUrl }: WatchedClientProp
   const [activeFilter, setActiveFilter] = useState<ActiveFilter | null>(null)
 
   const buttons = [
-    { label: '🤝 Agreed',                       value: 'agreed' },
-    { label: '⚔️ Disagreed',                    value: 'disagreed' },
-    { label: `📋 Needs ${userNames.user1}`,      value: 'needs_user1' },
-    { label: `📋 Needs ${userNames.user2}`,      value: 'needs_user2' },
+    { label: 'Agreed',                     value: 'agreed' },
+    { label: 'Disagreed',                  value: 'disagreed' },
+    { label: `Needs ${userNames.user1}`,    value: 'needs_user1' },
+    { label: `Needs ${userNames.user2}`,    value: 'needs_user2' },
   ]
 
   const lowerSearch = search.toLowerCase()
@@ -46,12 +47,12 @@ export function WatchedClient({ movies, userNames, seerrUrl }: WatchedClientProp
       />
 
       {filteredMovies.length === 0 ? (
-        <div className="text-center text-amber-600 mt-16">
-          <div className="text-5xl mb-4">✅</div>
-          <p className="font-medium">
+        <div className="text-center text-muted-foreground mt-16">
+          <CheckCircle2 className="w-10 h-10 mx-auto mb-4" aria-hidden="true" />
+          <p className="font-medium text-foreground">
             {search || activeFilter ? 'No movies match your filter' : 'Nothing watched yet'}
           </p>
-          <p className="text-sm text-amber-500 mt-1">
+          <p className="text-sm mt-1">
             {search || activeFilter
               ? 'Try clearing the search or filter'
               : 'Your finished films will appear here'}

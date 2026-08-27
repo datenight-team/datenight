@@ -52,34 +52,34 @@ const defaultProps = {
 describe('MovieRow status pill colors', () => {
   beforeEach(() => mockFetch.mockReset())
 
-  it('renders not_requested pill with stone classes', () => {
+  it('renders not_requested pill with muted classes', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'not_requested' })} {...defaultProps} />)
     const pill = screen.getByText('Not Requested')
-    expect(pill).toHaveClass('bg-stone-100', 'text-stone-500', 'border-stone-200')
+    expect(pill).toHaveClass('bg-muted', 'text-muted-foreground', 'border-transparent')
   })
 
-  it('renders pending pill with indigo classes', () => {
+  it('renders pending pill with queued classes', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'pending' })} {...defaultProps} />)
     const pill = screen.getByText('Queued')
-    expect(pill).toHaveClass('bg-indigo-50', 'text-indigo-600', 'border-indigo-200')
+    expect(pill).toHaveClass('bg-queued-bg', 'text-queued', 'border-transparent')
   })
 
-  it('renders processing pill with amber classes', () => {
+  it('renders processing pill with downloading classes', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'processing' })} {...defaultProps} />)
     const pill = screen.getByText('Downloading')
-    expect(pill).toHaveClass('bg-amber-50', 'text-amber-600', 'border-amber-200')
+    expect(pill).toHaveClass('bg-downloading-bg', 'text-downloading', 'border-transparent')
   })
 
-  it('renders available pill with green classes', () => {
+  it('renders available pill with success classes', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'available' })} {...defaultProps} />)
     const pill = screen.getByText('Ready')
-    expect(pill).toHaveClass('bg-green-50', 'text-green-700', 'border-green-200')
+    expect(pill).toHaveClass('bg-success-bg', 'text-success', 'border-transparent')
   })
 
-  it('renders deleted pill with stone classes', () => {
+  it('renders deleted pill with muted classes', () => {
     render(<MovieRow movie={makeMovie({ seerrStatus: 'deleted' })} {...defaultProps} />)
     const pill = screen.getByText('Deleted')
-    expect(pill).toHaveClass('bg-stone-100', 'text-stone-500', 'border-stone-200')
+    expect(pill).toHaveClass('bg-muted', 'text-muted-foreground', 'border-transparent')
   })
 })
 
@@ -103,7 +103,7 @@ describe('MovieRow layout', () => {
     expect(infoSection).toContainElement(screen.getByText('Queued'))
   })
 
-  it('renders Watch link with amber outline instead of dark stone', () => {
+  it('renders Watch link with a primary-tinted outline instead of a dark fill', () => {
     render(
       <MovieRow
         movie={makeMovie({ seerrStatus: 'available' })}
@@ -114,7 +114,7 @@ describe('MovieRow layout', () => {
     )
     const watchLink = screen.getByRole('link', { name: /watch/i })
     expect(watchLink).not.toHaveClass('bg-stone-800')
-    expect(watchLink).toHaveClass('border-amber-400')
+    expect(watchLink).toHaveClass('border-primary/40')
   })
 })
 

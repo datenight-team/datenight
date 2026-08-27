@@ -1,5 +1,5 @@
-// src/components/movie-poster.tsx
 import Image from 'next/image'
+import { Clapperboard } from 'lucide-react'
 
 interface MoviePosterProps {
   posterUrl: string | null | undefined
@@ -9,24 +9,24 @@ interface MoviePosterProps {
 
 const sizeConfig = {
   sm: {
-    container: 'w-9 h-14 bg-amber-100 rounded flex-shrink-0 overflow-hidden',
+    container: 'w-9 h-14 bg-muted rounded flex-shrink-0 overflow-hidden',
     imgWidth: 36,
     imgHeight: 56,
-    placeholder: 'text-amber-400 text-xs',
+    iconClass: 'w-3.5 h-3.5 text-muted-foreground',
     fill: false as const,
   },
   md: {
-    container: 'w-16 h-24 bg-amber-100 rounded-lg flex-shrink-0 overflow-hidden',
+    container: 'w-16 h-24 bg-muted rounded-lg flex-shrink-0 overflow-hidden',
     imgWidth: 64,
     imgHeight: 96,
-    placeholder: 'text-amber-300 text-2xl',
+    iconClass: 'w-6 h-6 text-muted-foreground',
     fill: false as const,
   },
   lg: {
-    container: 'relative w-full aspect-[2/3] bg-amber-100',
+    container: 'relative w-full aspect-[2/3] bg-muted',
     imgWidth: 0,  // unused — lg uses next/image fill mode, not explicit dimensions
     imgHeight: 0, // unused — lg uses next/image fill mode, not explicit dimensions
-    placeholder: 'text-amber-300 text-4xl',
+    iconClass: 'w-10 h-10 text-muted-foreground',
     fill: true as const,
   },
 }
@@ -48,8 +48,8 @@ export function MoviePoster({ posterUrl, title, size }: MoviePosterProps) {
           />
         )
       ) : (
-        <div className={`w-full h-full flex items-center justify-center ${cfg.placeholder}`}>
-          🎥
+        <div className="w-full h-full flex items-center justify-center">
+          <Clapperboard className={cfg.iconClass} aria-hidden="true" />
         </div>
       )}
     </div>

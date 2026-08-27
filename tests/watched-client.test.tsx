@@ -65,17 +65,17 @@ describe('WatchedClient', () => {
     expect(screen.queryByText('Sunrise')).not.toBeInTheDocument()
   })
 
-  it('filters to agreed movies when 🤝 Agreed is clicked', () => {
+  it('filters to agreed movies when Agreed is clicked', () => {
     render(<WatchedClient movies={movies} userNames={userNames} />)
-    fireEvent.click(screen.getByRole('button', { name: '🤝 Agreed' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Agreed' }))
     expect(screen.getByText('Akira')).toBeInTheDocument()
     expect(screen.queryByText('Breathless')).not.toBeInTheDocument()
     expect(screen.queryByText('Sunrise')).not.toBeInTheDocument()
   })
 
-  it('filters to disagreed movies when ⚔️ Disagreed is clicked', () => {
+  it('filters to disagreed movies when Disagreed is clicked', () => {
     render(<WatchedClient movies={movies} userNames={userNames} />)
-    fireEvent.click(screen.getByRole('button', { name: '⚔️ Disagreed' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Disagreed' }))
     expect(screen.queryByText('Akira')).not.toBeInTheDocument()
     expect(screen.getByText('Breathless')).toBeInTheDocument()
     expect(screen.queryByText('Sunrise')).not.toBeInTheDocument()
@@ -83,7 +83,7 @@ describe('WatchedClient', () => {
 
   it('excludes unrated movies from agreement filters', () => {
     render(<WatchedClient movies={movies} userNames={userNames} />)
-    fireEvent.click(screen.getByRole('button', { name: '🤝 Agreed' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Agreed' }))
     expect(screen.queryByText('Sunrise')).not.toBeInTheDocument()
   })
 
@@ -95,7 +95,7 @@ describe('WatchedClient', () => {
 
   it('restores all movies when All is clicked', () => {
     render(<WatchedClient movies={movies} userNames={userNames} />)
-    fireEvent.click(screen.getByRole('button', { name: '🤝 Agreed' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Agreed' }))
     fireEvent.click(screen.getByRole('button', { name: 'All' }))
     expect(screen.getByText('Akira')).toBeInTheDocument()
     expect(screen.getByText('Breathless')).toBeInTheDocument()
