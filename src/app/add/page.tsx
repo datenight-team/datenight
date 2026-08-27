@@ -1,8 +1,8 @@
-// src/app/add/page.tsx
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { Film, Clapperboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { MoviePreview } from '@/types'
@@ -58,7 +58,7 @@ export default function AddMoviePage() {
 
   return (
     <div className="p-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-amber-900 mb-6">Add a Movie</h1>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-6">Add a Movie</h1>
 
       <div className="flex gap-2 mb-2">
         <Input
@@ -67,46 +67,45 @@ export default function AddMoviePage() {
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handlePreview()}
           inputMode="url"
-          className="border-amber-300 focus:ring-amber-400"
         />
         <Button
           onClick={handlePreview}
           disabled={!url.trim() || loading}
-          className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+          className="shrink-0"
         >
           {loading ? '…' : 'Preview'}
         </Button>
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm mb-4">{error}</p>
+        <p className="text-destructive text-sm mb-4">{error}</p>
       )}
 
-      <p className="text-xs text-amber-600">
+      <p className="text-xs text-muted-foreground">
         Supports imdb.com/title/... and criterion.com/films/... URLs
       </p>
 
-      <div className="flex gap-4 text-xs text-amber-600 mb-6">
+      <div className="flex gap-4 text-xs text-muted-foreground mb-6">
         <a
           href="https://www.criterion.com/shop/browse/list?q=&format=all"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-amber-800 underline transition-colors"
+          className="inline-flex items-center gap-1 hover:text-primary underline transition-colors"
         >
-          🎞️ Browse Criterion
+          <Film className="w-3 h-3" aria-hidden="true" /> Browse Criterion
         </a>
         <a
           href="https://www.imdb.com/search/title/?title_type=feature"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-amber-800 underline transition-colors"
+          className="inline-flex items-center gap-1 hover:text-primary underline transition-colors"
         >
-          🎬 Browse IMDB
+          <Clapperboard className="w-3 h-3" aria-hidden="true" /> Browse IMDB
         </a>
       </div>
 
       {preview && (
-        <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">
+        <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
           <div className="flex gap-4">
             {preview.posterUrl && (
               <Image
@@ -118,25 +117,23 @@ export default function AddMoviePage() {
               />
             )}
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold text-stone-900 text-lg leading-tight">{preview.title}</h2>
-              <p className="text-stone-500 text-sm mb-2">
+              <h2 className="font-bold text-foreground text-lg leading-tight">{preview.title}</h2>
+              <p className="text-muted-foreground text-sm mb-2">
                 {preview.year} · {formatRuntime(preview.runtime)}
               </p>
-              <p className="text-stone-600 text-sm line-clamp-3">{preview.description}</p>
+              <p className="text-muted-foreground text-sm line-clamp-3">{preview.description}</p>
             </div>
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="outline"
               onClick={() => setPreview(null)}
-              className="border-amber-300 text-amber-700"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAdd}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white"
             >
               {saving ? 'Adding…' : 'Add to List'}
             </Button>

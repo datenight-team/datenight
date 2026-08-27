@@ -1,4 +1,5 @@
 'use client'
+import { Handshake, Swords } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -36,19 +37,19 @@ export function MovieReviewModal({
   const renderReviewPanel = (user: User, rating: Rating | undefined) => {
     if (!rating) {
       return (
-        <div className="bg-stone-50 rounded-xl p-4 border border-stone-200">
-          <p className="text-xs font-bold text-stone-400 mb-2">{userNames[user]}</p>
-          <p className="text-sm text-stone-400 italic">No review yet</p>
+        <div className="bg-muted rounded-xl p-4 border border-border">
+          <p className="text-xs font-bold text-muted-foreground mb-2">{userNames[user]}</p>
+          <p className="text-sm text-muted-foreground italic">No review yet</p>
         </div>
       )
     }
     return (
-      <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+      <div className="bg-background rounded-xl p-4 border border-border">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-amber-900">{userNames[user]}</span>
+          <span className="text-xs font-bold text-foreground">{userNames[user]}</span>
           <ThumbRating value={rating.rating as RatingValue} readonly size="sm" />
         </div>
-        <p className="text-sm text-stone-600 italic leading-relaxed">
+        <p className="text-sm text-muted-foreground italic leading-relaxed">
           &ldquo;{rating.quote}&rdquo;
         </p>
       </div>
@@ -62,13 +63,15 @@ export function MovieReviewModal({
           <div className="flex gap-4 items-start">
             <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="md" />
             <div className="min-w-0">
-              <DialogTitle className="text-base font-bold text-stone-900 leading-tight mb-1">
+              <DialogTitle className="text-base font-bold text-foreground leading-tight mb-1">
                 {movie.title}
               </DialogTitle>
-              <p className="text-sm text-stone-400 mb-2">{movie.year}</p>
+              <p className="text-sm text-muted-foreground mb-2">{movie.year}</p>
               {bothRated && (
-                <span className="inline-flex items-center gap-1.5 bg-stone-100 rounded-full px-2.5 py-1 text-xs font-medium text-stone-600">
-                  {agreed ? '🤝 You agreed' : '⚔️ You disagreed'}
+                <span className="inline-flex items-center gap-1.5 bg-muted rounded-full px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                  {agreed
+                    ? <><Handshake className="w-3.5 h-3.5" aria-hidden="true" /> You agreed</>
+                    : <><Swords className="w-3.5 h-3.5" aria-hidden="true" /> You disagreed</>}
                 </span>
               )}
             </div>
@@ -76,7 +79,7 @@ export function MovieReviewModal({
         </DialogHeader>
 
         {ratings.length === 0 ? (
-          <p className="text-sm text-stone-400 italic text-center py-6">No reviews yet</p>
+          <p className="text-sm text-muted-foreground italic text-center py-6">No reviews yet</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
             {renderReviewPanel('user1', r1)}
@@ -89,19 +92,19 @@ export function MovieReviewModal({
             <button
               type="button"
               onClick={() => onEditUser('user1')}
-              className="text-sm min-h-[44px] flex items-center text-stone-400 hover:text-amber-600 transition-colors"
+              className="text-sm min-h-[44px] flex items-center text-muted-foreground hover:text-primary transition-colors"
             >
               Edit {userNames.user1}&apos;s review
             </button>
             <button
               type="button"
               onClick={() => onEditUser('user2')}
-              className="text-sm min-h-[44px] flex items-center text-stone-400 hover:text-amber-600 transition-colors"
+              className="text-sm min-h-[44px] flex items-center text-muted-foreground hover:text-primary transition-colors"
             >
               Edit {userNames.user2}&apos;s review
             </button>
           </div>
-          <Button data-testid="modal-close-btn" size="sm" onClick={onClose} className="bg-amber-500 hover:bg-amber-600 text-white">
+          <Button data-testid="modal-close-btn" size="sm" onClick={onClose}>
             Close
           </Button>
         </DialogFooter>

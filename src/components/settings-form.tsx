@@ -2,6 +2,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Users, Clapperboard, Download, Tv, Bot, Play, Eye, EyeOff, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -23,7 +24,7 @@ interface Row {
 
 interface Section {
   title: string
-  icon: string
+  icon: LucideIcon
   description?: string
   rows: Row[]
 }
@@ -31,7 +32,7 @@ interface Section {
 const SECTIONS: Section[] = [
   {
     title: 'General',
-    icon: '👥',
+    icon: Users,
     rows: [
       {
         fields: [
@@ -43,7 +44,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: 'TMDB',
-    icon: '🎬',
+    icon: Clapperboard,
     description: 'Required for Add Movie',
     rows: [
       {
@@ -63,7 +64,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: 'Seerr',
-    icon: '📥',
+    icon: Download,
     description: 'Optional — for auto-requesting downloads',
     rows: [
       {
@@ -82,7 +83,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: 'Plex',
-    icon: '📺',
+    icon: Tv,
     description: 'Optional — for Date Night collection sync',
     rows: [
       {
@@ -95,7 +96,7 @@ const SECTIONS: Section[] = [
   },
   {
     title: 'Anthropic',
-    icon: '🤖',
+    icon: Bot,
     description: 'Optional — for Recommendations feature',
     rows: [
       {
@@ -192,13 +193,13 @@ export function SettingsForm({
       {SECTIONS.map((section) => (
         <div
           key={section.title}
-          className="bg-white rounded-xl border border-amber-200 mb-5 overflow-hidden"
+          className="bg-card rounded-xl border border-border mb-5 overflow-hidden"
         >
-          <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border-b border-amber-200">
-            <span className="text-base">{section.icon}</span>
-            <span className="font-semibold text-sm text-amber-900">{section.title}</span>
+          <div className="flex items-center gap-2 px-5 py-3 bg-muted border-b border-border">
+            <section.icon className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
+            <span className="font-semibold text-sm text-foreground">{section.title}</span>
             {section.description && (
-              <span className="ml-auto text-xs text-amber-600">{section.description}</span>
+              <span className="ml-auto text-xs text-muted-foreground">{section.description}</span>
             )}
           </div>
           <div className="px-5 py-5 flex flex-col gap-4">
@@ -212,17 +213,17 @@ export function SettingsForm({
                     <div className="flex items-center gap-2">
                       <label
                         htmlFor={field.key}
-                        className="text-xs font-semibold text-amber-900 uppercase tracking-wide"
+                        className="text-xs font-semibold text-foreground uppercase tracking-wide"
                       >
                         {field.label}
                       </label>
                       {field.badge === 'required' && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-downloading-bg text-primary border border-border">
                           required
                         </span>
                       )}
                       {field.badge === 'optional' && (
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           optional
                         </span>
                       )}
@@ -234,30 +235,28 @@ export function SettingsForm({
                         value={values[field.key] ?? ''}
                         onChange={(e) => set(field.key, e.target.value)}
                         placeholder={field.placeholder}
-                        className={`bg-amber-50 border-amber-200 focus:border-amber-500 ${
-                          field.sensitive ? 'pr-9' : ''
-                        }`}
+                        className={field.sensitive ? 'pr-9' : ''}
                       />
                       {field.sensitive && (
                         <button
                           type="button"
                           onClick={() => toggleReveal(field.key)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-500 hover:text-amber-700 text-sm"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
                           title={revealed[field.key] ? 'Hide' : 'Reveal'}
                         >
-                          {revealed[field.key] ? '🙈' : '👁'}
+                          {revealed[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       )}
                     </div>
                     {(field.hint || field.hintUrl) && (
-                      <p className="text-xs text-amber-600">
+                      <p className="text-xs text-muted-foreground">
                         {field.hint}{field.hint && field.hintUrl ? ' ' : ''}
                         {field.hintUrl && (
                           <a
                             href={field.hintUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-amber-700 hover:underline"
+                            className="font-medium text-primary hover:underline"
                           >
                             {field.hintLinkText ?? field.hintUrl} ↗
                           </a>
@@ -274,17 +273,17 @@ export function SettingsForm({
       ))}
 
       {/* Streaming section — custom layout (provider checkboxes don't fit the text-field pattern) */}
-      <div className="bg-white rounded-xl border border-amber-200 mb-5 overflow-hidden">
-        <div className="flex items-center gap-2 px-5 py-3 bg-amber-50 border-b border-amber-200">
-          <span className="text-base">▶️</span>
-          <span className="font-semibold text-sm text-amber-900">Streaming</span>
-          <span className="ml-auto text-xs text-amber-600">Optional — for streaming availability</span>
+      <div className="bg-card rounded-xl border border-border mb-5 overflow-hidden">
+        <div className="flex items-center gap-2 px-5 py-3 bg-muted border-b border-border">
+          <Play className="w-4 h-4 text-muted-foreground" fill="currentColor" aria-hidden="true" />
+          <span className="font-semibold text-sm text-foreground">Streaming</span>
+          <span className="ml-auto text-xs text-muted-foreground">Optional — for streaming availability</span>
         </div>
         <div className="px-5 py-5 flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="streaming_region"
-              className="text-xs font-semibold text-amber-900 uppercase tracking-wide"
+              className="text-xs font-semibold text-foreground uppercase tracking-wide"
             >
               Region
             </label>
@@ -292,7 +291,7 @@ export function SettingsForm({
               id="streaming_region"
               value={values['streaming_region'] ?? 'US'}
               onChange={(e) => set('streaming_region', e.target.value)}
-              className="w-64 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              className="w-64 rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="AR">Argentina</option>
               <option value="AU">Australia</option>
@@ -324,19 +323,19 @@ export function SettingsForm({
               <option value="GB">United Kingdom</option>
               <option value="US">United States</option>
             </select>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-muted-foreground">
               Determines which streaming services are shown.
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-semibold text-amber-900 uppercase tracking-wide">
+            <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
               Your Streaming Services
             </span>
             {loadingProviders ? (
-              <p className="text-xs text-amber-600">Loading providers…</p>
+              <p className="text-xs text-muted-foreground">Loading providers…</p>
             ) : providers.length === 0 ? (
-              <p className="text-xs text-amber-600">
+              <p className="text-xs text-muted-foreground">
                 No providers found. Check your TMDB API key and region above.
               </p>
             ) : (
@@ -350,8 +349,8 @@ export function SettingsForm({
                       onClick={() => toggleProvider(p.providerId)}
                       className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                         selected
-                          ? 'border-amber-500 bg-amber-500 text-white'
-                          : 'border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+                          ? 'border-transparent bg-primary text-primary-foreground'
+                          : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -371,7 +370,7 @@ export function SettingsForm({
                 })}
               </div>
             )}
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-muted-foreground">
               Select the services you subscribe to. Movies available on these services will show Watch buttons.
             </p>
           </div>
@@ -379,13 +378,12 @@ export function SettingsForm({
       </div>
 
       <div className="flex items-center justify-between pt-2 pb-6">
-        <p className="text-sm text-amber-600">
+        <p className="text-sm text-muted-foreground">
           Changes are saved to the database and take effect immediately.
         </p>
         <Button
           type="submit"
           disabled={saving}
-          className="bg-amber-600 hover:bg-amber-700 text-white"
         >
           {saving ? 'Saving…' : submitLabel}
         </Button>

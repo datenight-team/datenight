@@ -35,13 +35,13 @@ describe('MobileBottomNav', () => {
   it('highlights the active tab', () => {
     render(<MobileBottomNav />)
     const listLink = screen.getByRole('link', { name: /list/i })
-    expect(listLink).toHaveClass('text-amber-700')
+    expect(listLink).toHaveClass('text-foreground')
     const iconSpan = listLink.querySelector('span')
-    expect(iconSpan).toHaveClass('bg-amber-700')
+    expect(iconSpan).toHaveClass('bg-primary')
     const watchedLink = screen.getByRole('link', { name: /watched/i })
-    expect(watchedLink).not.toHaveClass('text-amber-700')
+    expect(watchedLink).not.toHaveClass('text-foreground')
     const inactiveIconSpan = watchedLink.querySelector('span')
-    expect(inactiveIconSpan).not.toHaveClass('bg-amber-700')
+    expect(inactiveIconSpan).not.toHaveClass('bg-primary')
   })
 
   it('applies bold font weight to the active tab label', () => {

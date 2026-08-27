@@ -91,27 +91,27 @@ export function EditRatingDialog({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-amber-900">{movie.title}</DialogTitle>
+          <DialogTitle>{movie.title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <p className="text-sm text-stone-600">{userNames[user]}&apos;s verdict</p>
+          <p className="text-sm text-muted-foreground">{userNames[user]}&apos;s verdict</p>
           <div>
-            <p className="text-xs text-stone-500 mb-2">Verdict</p>
+            <p className="text-xs text-muted-foreground mb-2">Verdict</p>
             <ThumbRating value={rating} onChange={setRating} size="lg" />
           </div>
           <div>
-            <p className="text-xs text-stone-500 mb-1">Critic&apos;s Quote</p>
+            <p className="text-xs text-muted-foreground mb-1">Critic&apos;s Quote</p>
             <Textarea
               placeholder="A sentence or two about the film..."
               value={quote}
               onChange={(e) => setQuote(e.target.value)}
-              className="border-amber-300 focus:ring-amber-400 resize-none"
+              className="resize-none"
               rows={3}
             />
           </div>
-          {error && <p className="text-red-600 text-xs">{error}</p>}
+          {error && <p className="text-destructive text-xs">{error}</p>}
           <Button
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+            className="w-full"
             onClick={handleSave}
             disabled={saving || !rating || !quote.trim()}
           >
@@ -119,7 +119,7 @@ export function EditRatingDialog({
           </Button>
           <Button
             variant="outline"
-            className="w-full border-amber-300 text-amber-700"
+            className="w-full"
             onClick={onClose}
             disabled={saving}
           >
@@ -128,7 +128,7 @@ export function EditRatingDialog({
           {existingRating && !confirmDelete && (
             <Button
               variant="ghost"
-              className="w-full text-red-400 hover:text-red-600 hover:bg-red-50 text-xs"
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 text-xs"
               onClick={() => setConfirmDelete(true)}
               disabled={saving}
             >
@@ -136,19 +136,20 @@ export function EditRatingDialog({
             </Button>
           )}
           {existingRating && confirmDelete && (
-            <div className="space-y-2 pt-1 border-t border-red-100">
-              <p className="text-xs text-center text-stone-500">Are you sure?</p>
+            <div className="space-y-2 pt-1 border-t border-border">
+              <p className="text-xs text-center text-muted-foreground">Are you sure?</p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="flex-1 text-xs border-stone-200 text-stone-500"
+                  className="flex-1 text-xs"
                   onClick={() => setConfirmDelete(false)}
                   disabled={deleting}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 text-xs bg-red-500 hover:bg-red-600 text-white"
+                  variant="destructive"
+                  className="flex-1 text-xs"
                   onClick={handleDelete}
                   disabled={deleting}
                 >

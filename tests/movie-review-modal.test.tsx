@@ -72,7 +72,7 @@ describe('MovieReviewModal', () => {
         open={true} onClose={onClose} onEditUser={onEditUser}
       />
     )
-    expect(screen.getByText('🤝 You agreed')).toBeInTheDocument()
+    expect(screen.getByText('You agreed')).toBeInTheDocument()
   })
 
   it('shows disagree badge when users rated differently', () => {
@@ -86,7 +86,7 @@ describe('MovieReviewModal', () => {
         open={true} onClose={onClose} onEditUser={onEditUser}
       />
     )
-    expect(screen.getByText('⚔️ You disagreed')).toBeInTheDocument()
+    expect(screen.getByText('You disagreed')).toBeInTheDocument()
   })
 
   it('shows No review yet placeholder for a user with no rating', () => {

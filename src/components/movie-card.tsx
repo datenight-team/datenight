@@ -1,6 +1,7 @@
 // src/components/movie-card.tsx
 'use client'
 import { useState } from 'react'
+import { ExternalLink, Handshake, Swords, PartyPopper, Sparkles } from 'lucide-react'
 import { ThumbRating } from './thumb-rating'
 import { MoviePoster } from './movie-poster'
 import { EditRatingDialog } from './edit-rating-dialog'
@@ -50,11 +51,11 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
 
     if (!hasRated) {
       return (
-        <div key={user} className="bg-stone-50 rounded-lg p-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-stone-400">{userNames[user]}</span>
+        <div key={user} className="bg-muted rounded-lg p-2 flex items-center justify-between">
+          <span className="text-xs font-semibold text-muted-foreground">{userNames[user]}</span>
           <button
             onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
-            className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
+            className="text-xs text-primary hover:opacity-75 transition-opacity"
           >
             Add Review
           </button>
@@ -63,42 +64,42 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
     }
 
     return (
-      <div key={user} className="bg-amber-50 rounded-lg p-2">
+      <div key={user} className="bg-background rounded-lg p-2">
         <div className="flex justify-between items-center mb-0.5">
-          <span className="text-xs font-semibold text-amber-900">{userNames[user]}</span>
+          <span className="text-xs font-semibold text-foreground">{userNames[user]}</span>
           <div className="flex items-center gap-1.5">
             {bothRated ? (
               <ThumbRating value={r.rating as RatingValue} readonly size="sm" />
             ) : (
-              <span className="text-xs text-green-600">✓</span>
+              <span className="text-xs text-success">✓</span>
             )}
             <button
               onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
-              className="text-xs text-amber-500 hover:text-amber-700 transition-colors"
+              className="text-xs text-primary hover:opacity-75 transition-opacity"
             >
               Edit
             </button>
           </div>
         </div>
         {bothRated && (
-          <p className="text-xs text-stone-500 italic line-clamp-2">&ldquo;{r.quote}&rdquo;</p>
+          <p className="text-xs text-muted-foreground italic line-clamp-2">&ldquo;{r.quote}&rdquo;</p>
         )}
       </div>
     )
   }
 
   return (
-    <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
       {/* Clickable poster + header area */}
       <button
-        className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+        className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => setReviewModalOpen(true)}
         aria-label={`View reviews for ${movie.title}`}
       >
         <MoviePoster posterUrl={movie.posterUrl} title={movie.title} size="lg" />
 
         <div className="px-3 pt-3 pb-1">
-          <h3 className="font-bold text-stone-900 text-sm leading-tight mb-0.5">
+          <h3 className="font-bold text-foreground text-sm leading-tight mb-0.5 flex items-center gap-1">
             {movie.title}
             {seerrUrl && (
               <a
@@ -106,24 +107,27 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="ml-1 text-amber-500 hover:text-amber-700 transition-colors font-normal text-xs"
+                className="text-primary hover:opacity-75 transition-opacity"
                 title="View in Seerr"
               >
-                ↗
+                <ExternalLink className="w-3 h-3" aria-hidden="true" />
               </a>
             )}
           </h3>
           <div className="flex items-center justify-between">
-            <p className="text-stone-400 text-xs">{movie.year}</p>
+            <p className="text-muted-foreground text-xs">{movie.year}</p>
             {bothRated && (
-              <span className="text-xs text-stone-400" title={agreed ? 'You agreed' : 'You disagreed'}>
-                {agreed ? '🤝' : '⚔️'}
+              <span className="text-muted-foreground" title={agreed ? 'You agreed' : 'You disagreed'}>
+                {agreed
+                  ? <Handshake className="w-3.5 h-3.5" aria-hidden="true" />
+                  : <Swords className="w-3.5 h-3.5" aria-hidden="true" />}
               </span>
             )}
           </div>
           {movie.matchedViaSwipe && (
-            <span className="mt-1 inline-block rounded-full border px-2 py-0.5 text-xs font-semibold bg-pink-50 text-pink-600 border-pink-200">
-              It&apos;s a match! 🎉
+            <span className="mt-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold bg-rose-bg text-rose border-transparent">
+              <PartyPopper className="w-3 h-3" aria-hidden="true" />
+              It&apos;s a match!
             </span>
           )}
         </div>
@@ -133,7 +137,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
       <div className="px-3 pb-3">
         <div className="mt-2">
           {localRatings.length === 0 ? (
-            <p className="text-xs text-stone-400 italic text-center py-2">
+            <p className="text-xs text-muted-foreground italic text-center py-2">
               Waiting for both ratings…
             </p>
           ) : (
@@ -145,25 +149,26 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
 
         {/* Cleanup button — only shown when movie has a Seerr entry */}
         {movie.seerrMediaId && (
-          <div className="mt-2 pt-2 border-t border-amber-100 text-center">
+          <div className="mt-2 pt-2 border-t border-border text-center">
             {cleanupState === 'idle' && (
               <button
                 onClick={handleCleanup}
-                className="text-xs text-stone-400 hover:text-red-400 transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
               >
-                🧹 Clean up from Plex
+                <Sparkles className="w-3 h-3" aria-hidden="true" />
+                Clean up from Plex
               </button>
             )}
             {cleanupState === 'loading' && (
-              <p className="text-xs text-stone-400">Cleaning up…</p>
+              <p className="text-xs text-muted-foreground">Cleaning up…</p>
             )}
             {cleanupState === 'done' && (
-              <p className="text-xs text-green-600">Cleaned up ✓</p>
+              <p className="text-xs text-success">Cleaned up ✓</p>
             )}
             {cleanupState === 'error' && (
               <button
                 onClick={handleCleanup}
-                className="text-xs text-red-500 hover:text-red-600 transition-colors"
+                className="text-xs text-destructive hover:opacity-75 transition-opacity"
               >
                 Failed — try again
               </button>

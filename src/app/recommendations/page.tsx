@@ -1,8 +1,9 @@
-// src/app/recommendations/page.tsx
 'use client'
 import { useState } from 'react'
+import { Clapperboard, Target, Info, Handshake, Dices } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MoviePoster } from '@/components/movie-poster'
+import { cn } from '@/lib/utils'
 import type { RecommendationsResult, Recommendation } from '@/lib/recommendations'
 import { formatRuntime } from '@/lib/utils'
 
@@ -80,8 +81,8 @@ export default function RecommendationsPage() {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-amber-900 mb-1">Recommendations</h1>
-        <p className="text-sm text-stone-500">
+        <h1 className="text-2xl font-display font-bold text-foreground mb-1">Recommendations</h1>
+        <p className="text-sm text-muted-foreground">
           Claude analyzes what you both agreed on and suggests what to watch next.
         </p>
       </div>
@@ -91,23 +92,24 @@ export default function RecommendationsPage() {
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <div
             onClick={() => setCriterionOnly(!criterionOnly)}
-            className={`relative w-10 h-5 rounded-full transition-colors ${
-              criterionOnly ? 'bg-amber-600' : 'bg-stone-200'
-            }`}
+            className={cn(
+              'relative w-10 h-5 rounded-full transition-colors',
+              criterionOnly ? 'bg-primary' : 'bg-border'
+            )}
           >
             <span
-              className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+              className={cn(
+                'absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform',
                 criterionOnly ? 'translate-x-5' : 'translate-x-0.5'
-              }`}
+              )}
             />
           </div>
-          <span className="text-sm text-stone-700">Criterion Collection only</span>
+          <span className="text-sm text-muted-foreground">Criterion Collection only</span>
         </label>
 
         <Button
           onClick={handleGetRecommendations}
           disabled={loading}
-          className="bg-amber-600 hover:bg-amber-700 text-white"
         >
           {loading ? 'Thinking…' : result ? 'Refresh' : 'Get Recommendations'}
         </Button>
@@ -116,17 +118,17 @@ export default function RecommendationsPage() {
       {/* Loading state */}
       {loading && (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4 animate-bounce">🎬</div>
-          <p className="text-amber-700 font-medium animate-pulse">
+          <Clapperboard className="w-10 h-10 mx-auto mb-4 text-primary animate-bounce" aria-hidden="true" />
+          <p className="text-primary font-medium animate-pulse">
             {LOADING_MESSAGES[loadingMsg]}
           </p>
-          <p className="text-xs text-stone-400 mt-2">This takes 15–30 seconds</p>
+          <p className="text-xs text-muted-foreground mt-2">This takes 15–30 seconds</p>
         </div>
       )}
 
       {/* Error state */}
       {error && !loading && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+        <div className="bg-rose-bg border border-rose/30 rounded-xl p-4 text-rose text-sm">
           {error}
         </div>
       )}
@@ -136,16 +138,17 @@ export default function RecommendationsPage() {
         <div>
           {/* Claude's reasoning */}
           {result.dataWarning && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-xs text-amber-700">
-              ℹ️ {result.dataWarning}
+            <div className="bg-downloading-bg border border-downloading/30 rounded-xl p-3 mb-4 text-xs text-downloading flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+              {result.dataWarning}
             </div>
           )}
           {result.reasoning && (
-            <div className="bg-white border border-amber-100 rounded-xl p-4 mb-5 shadow-sm">
-              <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">
+            <div className="bg-card border border-border rounded-xl p-4 mb-5 shadow-sm">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">
                 Claude&apos;s Analysis
               </p>
-              <p className="text-sm text-stone-600 italic">{result.reasoning}</p>
+              <p className="text-sm text-muted-foreground italic">{result.reasoning}</p>
             </div>
           )}
 
@@ -160,7 +163,7 @@ export default function RecommendationsPage() {
             ))}
           </div>
 
-          <p className="text-xs text-stone-400 text-center mt-6">
+          <p className="text-xs text-muted-foreground text-center mt-6">
             Powered by Claude Opus · Based on {result.agreedCount} films you both agreed on
           </p>
         </div>
@@ -168,10 +171,10 @@ export default function RecommendationsPage() {
 
       {/* Empty state */}
       {!result && !loading && !error && (
-        <div className="text-center text-amber-600 mt-16">
-          <div className="text-5xl mb-4">🎯</div>
-          <p className="font-medium">Ready when you are</p>
-          <p className="text-sm text-amber-500 mt-1">
+        <div className="text-center text-muted-foreground mt-16">
+          <Target className="w-10 h-10 mx-auto mb-4" aria-hidden="true" />
+          <p className="font-medium text-foreground">Ready when you are</p>
+          <p className="text-sm mt-1">
             Rate a few films together first for the best results.
           </p>
         </div>
@@ -201,7 +204,7 @@ function RecommendationCard({
   const isConsensus = rec.type === 'consensus'
 
   return (
-    <div className="bg-white border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
       <div className="flex gap-4 p-4">
         {/* Poster */}
         <MoviePoster posterUrl={rec.tmdb?.posterUrl} title={rec.title} size="md" />
@@ -210,37 +213,38 @@ function RecommendationCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <div>
-              <h3 className="font-bold text-stone-900 text-sm leading-tight">
+              <h3 className="font-bold text-foreground text-sm leading-tight">
                 {rec.tmdb?.title ?? rec.title}
               </h3>
-              <p className="text-stone-400 text-xs">
+              <p className="text-muted-foreground text-xs">
                 {rec.year} · {rec.director}
                 {rec.tmdb?.runtime ? ` · ${formatRuntime(rec.tmdb.runtime)}` : ''}
               </p>
             </div>
             <span
-              className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full border ${
-                isConsensus
-                  ? 'bg-amber-100 text-amber-700 border-amber-200'
-                  : 'bg-violet-100 text-violet-700 border-violet-200'
-              }`}
+              className={cn(
+                'flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border border-transparent',
+                isConsensus ? 'bg-downloading-bg text-primary' : 'bg-violet-bg text-violet'
+              )}
             >
-              {isConsensus ? '🤝 Consensus' : '🃏 Wild Card'}
+              {isConsensus
+                ? <><Handshake className="w-3 h-3" aria-hidden="true" /> Consensus</>
+                : <><Dices className="w-3 h-3" aria-hidden="true" /> Wild Card</>}
             </span>
           </div>
 
-          <p className="text-stone-600 text-xs leading-relaxed mb-3">{rec.reason}</p>
+          <p className="text-muted-foreground text-xs leading-relaxed mb-3">{rec.reason}</p>
 
           {/* Add button */}
           {rec.tmdb ? (
             added ? (
-              <span className="text-xs text-stone-400">
+              <span className="text-xs text-muted-foreground">
                 {rec.alreadyInList ? '✓ Already in your list' : '✓ Added to watchlist'}
               </span>
             ) : (
               <Button
                 size="sm"
-                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                className="text-xs"
                 onClick={handleAdd}
                 disabled={adding}
               >
@@ -248,13 +252,13 @@ function RecommendationCard({
               </Button>
             )
           ) : (
-            <span className="text-xs text-stone-400 italic">
+            <span className="text-xs text-muted-foreground italic">
               Search on{' '}
               <a
                 href={`https://www.imdb.com/find?q=${encodeURIComponent(rec.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-amber-600"
+                className="underline hover:text-primary"
               >
                 IMDB
               </a>{' '}

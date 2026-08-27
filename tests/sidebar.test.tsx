@@ -29,12 +29,12 @@ describe('Sidebar', () => {
     expect(screen.queryByText(/browse imdb/i)).not.toBeInTheDocument()
   })
 
-  it('wraps nav emoji icons with aria-hidden', () => {
+  it('marks nav icons as decorative with aria-hidden', () => {
     render(<Sidebar />)
     const navLinks = screen.getAllByRole('link')
     navLinks.forEach((link) => {
-      const iconSpan = link.querySelector('span[aria-hidden="true"]')
-      expect(iconSpan).not.toBeNull()
+      const icon = link.querySelector('[aria-hidden="true"]')
+      expect(icon).not.toBeNull()
     })
   })
 })

@@ -1,6 +1,7 @@
 // src/components/movie-row.tsx
 "use client";
 import { useState } from "react";
+import { ExternalLink, X, PartyPopper, Play } from "lucide-react";
 import { MoviePoster } from "./movie-poster";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,11 +22,11 @@ const SEERR_LABEL: Record<string, string> = {
 };
 
 const SEERR_PILL_CLASS: Record<string, string> = {
-  not_requested: "bg-stone-100 text-stone-500 border-stone-200",
-  pending:       "bg-indigo-50 text-indigo-600 border-indigo-200",
-  processing:    "bg-amber-50 text-amber-600 border-amber-200",
-  available:     "bg-green-50 text-green-700 border-green-200",
-  deleted:       "bg-stone-100 text-stone-500 border-stone-200",
+  not_requested: "bg-muted text-muted-foreground border-transparent",
+  pending:       "bg-queued-bg text-queued border-transparent",
+  processing:    "bg-downloading-bg text-downloading border-transparent",
+  available:     "bg-success-bg text-success border-transparent",
+  deleted:       "bg-muted text-muted-foreground border-transparent",
 };
 
 interface MovieRowProps {
@@ -55,7 +56,7 @@ export function MovieRow({
   const isStreamable = streamingProviders.length > 0;
   const isCheckingStreaming = !isStreamable && movie.streamingLastChecked == null;
 
-  const seerrPillClass = SEERR_PILL_CLASS[movie.seerrStatus] ?? "bg-stone-100 text-stone-500 border-stone-200";
+  const seerrPillClass = SEERR_PILL_CLASS[movie.seerrStatus] ?? "bg-muted text-muted-foreground border-transparent";
 
   const handleConfirmRemove = () => {
     setConfirming(false);
@@ -68,10 +69,10 @@ export function MovieRow({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 bg-white border border-amber-200 rounded-xl px-4 py-3 mb-2 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 bg-card border border-border rounded-xl px-4 py-3 mb-2 shadow-sm">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Position */}
-          <span className="text-amber-700 font-bold text-sm w-5 text-center flex-shrink-0">
+          <span className="font-display text-primary font-bold text-sm w-5 text-center flex-shrink-0">
             {position}
           </span>
 
@@ -82,40 +83,43 @@ export function MovieRow({
 
           {/* Info — title, year, pills, streaming */}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-stone-900 text-sm truncate">
+            <p className="font-semibold text-foreground text-sm truncate">
               {movie.title}
-            </p>
-            <div className="text-stone-400 text-xs flex items-center gap-1.5">
-              <span>
-                {movie.year} · {formatRuntime(movie.runtime)}
-              </span>
               {seerrUrl && (
                 <a
                   href={`${seerrUrl}/movie/${movie.tmdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-500 hover:text-amber-700 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                  className="ml-1.5 inline-flex align-middle text-primary hover:opacity-75 transition-opacity"
                   title="View in Seerr"
                 >
-                  ↗
+                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
                 </a>
               )}
+            </p>
+            <div className="text-muted-foreground text-xs flex items-center gap-1.5">
+              <span>
+                {movie.year} · {formatRuntime(movie.runtime)}
+              </span>
             </div>
 
             {/* Status pills + streaming info live here */}
             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
               {movie.matchedViaSwipe && (
-                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-pink-50 text-pink-600 border-pink-200">
-                  It&apos;s a match! 🎉
+                <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold bg-rose-bg text-rose border-transparent">
+                  <PartyPopper className="w-3 h-3" aria-hidden="true" />
+                  It&apos;s a match!
                 </span>
               )}
               {isStreamable && (
-                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border-green-200">
+                <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold bg-success-bg text-success border-transparent">
+                  <Play className="w-2.5 h-2.5" fill="currentColor" aria-hidden="true" />
                   Streaming
                 </span>
               )}
               {isCheckingStreaming && (
-                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-500 border-amber-200">
+                <span className="rounded-full border px-2 py-0.5 text-xs font-semibold bg-downloading-bg text-downloading border-transparent">
                   Checking…
                 </span>
               )}
@@ -142,9 +146,9 @@ export function MovieRow({
                   href={streamingLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded border border-amber-400 bg-white text-amber-700 px-2 py-0.5 text-xs font-medium hover:bg-amber-50 transition-colors"
+                  className="inline-flex items-center gap-1 rounded border border-primary/40 bg-card text-primary px-2 py-0.5 text-xs font-medium hover:bg-accent transition-colors"
                 >
-                  Watch ↗
+                  Watch <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -158,14 +162,14 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                className="text-xs"
                 onClick={() => onForceDownload(movie.id)}
               >
                 Download Now
               </Button>
               <Button
                 size="sm"
-                className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                className="text-xs"
                 onClick={() => onMarkWatched(movie)}
               >
                 Mark Watched
@@ -174,7 +178,7 @@ export function MovieRow({
           ) : movie.seerrStatus === "available" ? (
             <Button
               size="sm"
-              className="text-xs bg-amber-600 hover:bg-amber-700 text-white"
+              className="text-xs"
               onClick={() => onMarkWatched(movie)}
             >
               Mark Watched
@@ -184,7 +188,7 @@ export function MovieRow({
             <Button
               size="sm"
               variant="outline"
-              className="text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="text-xs"
               onClick={() => onForceDownload(movie.id)}
             >
               Download Now
@@ -196,7 +200,7 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="text-xs border-red-300 text-red-600 hover:bg-red-50"
+                className="text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
                 onClick={handleConfirmRemove}
               >
                 Remove
@@ -204,7 +208,7 @@ export function MovieRow({
               <Button
                 size="sm"
                 variant="outline"
-                className="text-xs border-stone-200 text-stone-400 hover:bg-stone-50"
+                className="text-xs"
                 onClick={() => setConfirming(false)}
               >
                 Cancel
@@ -213,10 +217,10 @@ export function MovieRow({
           ) : (
             <button
               onClick={() => setConfirming(true)}
-              className="w-9 h-9 flex items-center justify-center text-stone-300 hover:text-red-400 text-xs transition-colors"
+              className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-destructive text-xs transition-colors"
               aria-label="Remove from list"
             >
-              ✕
+              <X className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           )}
         </div>
@@ -226,18 +230,19 @@ export function MovieRow({
       <Dialog open={askSeerr} onOpenChange={(o) => !o && setAskSeerr(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-amber-900">
+            <DialogTitle>
               Remove from Plex too?
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-muted-foreground">
               <em>{movie.title}</em> is in your Plex library. Remove it from
               Plex and Radarr as well?
             </p>
             <div className="flex gap-2">
               <Button
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                variant="destructive"
+                className="flex-1"
                 onClick={() => {
                   setAskSeerr(false)
                   onRemove(movie.id, { seerr: true })
@@ -247,7 +252,7 @@ export function MovieRow({
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 border-stone-200 text-stone-600 hover:bg-stone-50"
+                className="flex-1"
                 onClick={() => {
                   setAskSeerr(false)
                   onRemove(movie.id, { seerr: false })

@@ -1,18 +1,18 @@
-// src/components/status-badge.tsx
 import type { SeerrStatus } from '@/types'
 
-const config: Record<SeerrStatus, { label: string; className: string }> = {
-  available:     { label: '● Ready',       className: 'bg-green-100 text-green-700 border-green-200' },
-  processing:    { label: '⏳ Downloading', className: 'bg-amber-100 text-amber-700 border-amber-300' },
-  pending:       { label: '○ Queued',      className: 'bg-stone-100 text-stone-500 border-stone-200' },
-  not_requested: { label: '○ Not Requested', className: 'bg-stone-100 text-stone-400 border-stone-200' },
-  deleted:       { label: '✓ Deleted',     className: 'bg-stone-100 text-stone-400 border-stone-200' },
+const config: Record<SeerrStatus, { label: string; className: string; dotClassName: string }> = {
+  available:     { label: 'Ready',       className: 'bg-success-bg text-success border-transparent', dotClassName: 'bg-success' },
+  processing:    { label: 'Downloading', className: 'bg-downloading-bg text-downloading border-transparent', dotClassName: 'bg-downloading' },
+  pending:       { label: 'Queued',      className: 'bg-queued-bg text-queued border-transparent', dotClassName: 'bg-queued' },
+  not_requested: { label: 'Not Requested', className: 'bg-muted text-muted-foreground border-transparent', dotClassName: 'bg-muted-foreground' },
+  deleted:       { label: 'Deleted',     className: 'bg-muted text-muted-foreground border-transparent', dotClassName: 'bg-muted-foreground' },
 }
 
 export function StatusBadge({ status }: { status: SeerrStatus }) {
-  const { label, className } = config[status] ?? config.not_requested
+  const { label, className, dotClassName } = config[status] ?? config.not_requested
   return (
-    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border ${className}`}>
+      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotClassName}`} aria-hidden="true" />
       {label}
     </span>
   )

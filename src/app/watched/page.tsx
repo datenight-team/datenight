@@ -20,7 +20,7 @@ export default async function WatchedPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-amber-900 mb-6">Watched</h1>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-6">Watched</h1>
       <WatchedClient
         movies={movies as Movie[]}
         userNames={userNames}
