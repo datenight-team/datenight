@@ -15,7 +15,7 @@
     "import": "tsx --env-file=.env.local scripts/import-csv.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.115.0",
+    "@anthropic-ai/sdk": "^0.122.0",
     "@prisma/adapter-better-sqlite3": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -25,7 +25,7 @@
     "better-sqlite3": "^13.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.27.0",
+    "lucide-react": "^1.35.0",
     "next": "16.3.3",
     "node-cron": "^4.6.0",
     "prisma": "^7.9.1",
