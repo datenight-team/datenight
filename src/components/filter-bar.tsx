@@ -44,6 +44,7 @@ export function FilterBar({
       </div>
       <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1 sm:flex-wrap sm:overflow-visible">
         <button
+          type="button"
           onClick={() => onButtonChange(null)}
           className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
             activeButton === null
@@ -55,6 +56,7 @@ export function FilterBar({
         </button>
         {buttons.map((btn) => (
           <button
+            type="button"
             key={btn.value}
             onClick={() => onButtonChange(activeButton === btn.value ? null : btn.value)}
             className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
@@ -68,6 +70,7 @@ export function FilterBar({
         ))}
         {extraPills?.map((pill) => (
           <button
+            type="button"
             key={pill.label}
             onClick={pill.onToggle}
             className={`flex-shrink-0 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${

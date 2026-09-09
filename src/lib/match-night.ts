@@ -125,7 +125,7 @@ export async function recordSwipe(
 ): Promise<SwipeResult> {
   return prisma.$transaction(async (tx): Promise<SwipeResult> => {
     const candidate = await tx.swipeCandidate.findUnique({ where: { id: candidateId } })
-    if (!candidate || candidate.status !== 'pending') {
+    if (candidate?.status !== 'pending') {
       return { status: 'ignored' }
     }
 
@@ -140,12 +140,12 @@ export async function recordSwipe(
     const otherSwipe = await tx.swipe.findUnique({
       where: { candidateId_user: { candidateId, user: other } },
     })
-    if (!otherSwipe || otherSwipe.vote !== 'up') {
+    if (otherSwipe?.vote !== 'up') {
       return { status: 'recorded' }
     }
 
     const { _max } = await tx.movie.aggregate({ _max: { sortOrder: true } })
-    let movie
+    let movie: Awaited<ReturnType<typeof tx.movie.create>>
     try {
       movie = await tx.movie.create({
         data: {

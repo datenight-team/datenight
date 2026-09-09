@@ -27,6 +27,7 @@ export function PlexSyncButton() {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={state === 'loading'}
       className="flex items-center gap-2.5 px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"
@@ -65,6 +66,7 @@ export function StreamingRefreshButton() {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={state === 'loading'}
       className="flex items-center gap-2.5 px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"

@@ -14,9 +14,9 @@ export async function GET(req: Request) {
 
   const providers = await fetchProviderList(region)
 
-  providers.forEach((p) =>
+  providers.forEach((p) => {
     downloadProviderLogo(p.providerId, p.logoPath).catch(() => {})
-  )
+  })
 
   return NextResponse.json(providers)
 }

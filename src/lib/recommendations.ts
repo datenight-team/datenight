@@ -77,7 +77,6 @@ export async function getRecommendations(
   })
 
   const watchedMovies = allMovies.filter((m) => m.status === 'watched')
-  const watchlistMovies = allMovies.filter((m) => m.status === 'watchlist')
 
   // Categorise by agreement
   const agreedUp: typeof watchedMovies = []
@@ -180,7 +179,7 @@ Recommend exactly 3 films — 2 consensus picks then 1 wildcard. Return this exa
 
   // Extract the text block (thinking blocks are separate)
   const textBlock = response.content.find((b) => b.type === 'text')
-  if (!textBlock || textBlock.type !== 'text') {
+  if (textBlock?.type !== 'text') {
     throw new Error('No text response from Claude')
   }
 

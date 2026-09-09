@@ -7,7 +7,7 @@ function createPrismaClient(): PrismaClient {
   // Strip the "file:" prefix, keep ":memory:" as-is
   const dbUrl = url.startsWith('file:') ? url.slice(5) : url
   const adapter = new PrismaBetterSqlite3({ url: dbUrl as ':memory:' | (string & {}) })
-  return new PrismaClient({ adapter } as any)
+  return new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0])
 }
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }

@@ -58,7 +58,6 @@ export async function searchByTitle(
 export async function lookupCriterionSlug(
   slug: string
 ): Promise<TmdbMovieDetails | null> {
-  const { tmdbApiKey } = await getConfig()
   try {
     const res = await fetch(`https://www.criterion.com/films/${slug}`)
     if (res.ok) {

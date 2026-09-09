@@ -90,8 +90,13 @@ export default function RecommendationsPage() {
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
         <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="sr-only"
+            checked={criterionOnly}
+            onChange={(e) => setCriterionOnly(e.target.checked)}
+          />
           <div
-            onClick={() => setCriterionOnly(!criterionOnly)}
             className={cn(
               'relative w-10 h-5 rounded-full transition-colors',
               criterionOnly ? 'bg-primary' : 'bg-border'
@@ -154,9 +159,9 @@ export default function RecommendationsPage() {
 
           {/* Recommendation cards */}
           <div className="space-y-4">
-            {result.recommendations.map((rec, i) => (
+            {result.recommendations.map((rec) => (
               <RecommendationCard
-                key={i}
+                key={`${rec.title}-${rec.year}`}
                 rec={rec}
                 onAdd={() => handleAdd(rec)}
               />
