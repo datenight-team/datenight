@@ -24,6 +24,7 @@ export function MobileHeader() {
       </div>
 
       <button
+        type="button"
         onClick={() => setOpen(true)}
         aria-label="More options"
         className="text-white p-1 hover:opacity-75 transition-opacity"

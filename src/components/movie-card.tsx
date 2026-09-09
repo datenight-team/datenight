@@ -54,6 +54,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
         <div key={user} className="bg-muted rounded-lg p-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground">{userNames[user]}</span>
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
             className="text-xs text-primary hover:opacity-75 transition-opacity"
           >
@@ -74,6 +75,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
               <span className="text-xs text-success">✓</span>
             )}
             <button
+              type="button"
               onClick={(e) => { e.stopPropagation(); setEditDialogUser(user) }}
               className="text-xs text-primary hover:opacity-75 transition-opacity"
             >
@@ -92,6 +94,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
     <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
       {/* Clickable poster + header area */}
       <button
+        type="button"
         className="w-full text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => setReviewModalOpen(true)}
         aria-label={`View reviews for ${movie.title}`}
@@ -152,6 +155,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
           <div className="mt-2 pt-2 border-t border-border text-center">
             {cleanupState === 'idle' && (
               <button
+                type="button"
                 onClick={handleCleanup}
                 className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
               >
@@ -167,6 +171,7 @@ export function MovieCard({ movie, userNames, seerrUrl }: MovieCardProps) {
             )}
             {cleanupState === 'error' && (
               <button
+                type="button"
                 onClick={handleCleanup}
                 className="text-xs text-destructive hover:opacity-75 transition-opacity"
               >

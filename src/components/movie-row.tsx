@@ -127,7 +127,7 @@ export function MovieRow({
                 {SEERR_LABEL[movie.seerrStatus] ?? movie.seerrStatus}
               </span>
               {isStreamable && streamingProviders.map((p) => (
-                // eslint-disable-next-line @next/next/no-img-element
+                // biome-ignore lint/performance/noImgElement: small fixed-size icon with onError fallback
                 <img
                   key={p.providerId}
                   src={`/streaming-logos/${p.providerId}.png`}
@@ -216,6 +216,7 @@ export function MovieRow({
             </>
           ) : (
             <button
+              type="button"
               onClick={() => setConfirming(true)}
               className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-destructive text-xs transition-colors"
               aria-label="Remove from list"

@@ -143,7 +143,7 @@ export function SettingsForm({
   // differs from `region` while a fetch is in flight → derived loading state
   const [loadedRegion, setLoadedRegion] = useState<string | null>(null)
 
-  const region = values['streaming_region'] || 'US'
+  const region = values.streaming_region || 'US'
   const loadingProviders = loadedRegion !== region
   useEffect(() => {
     fetch(`/api/streaming-providers?region=${encodeURIComponent(region)}`)
@@ -162,7 +162,7 @@ export function SettingsForm({
 
   function getSelectedProviderIds(): number[] {
     try {
-      return JSON.parse(values['streaming_services'] || '[]')
+      return JSON.parse(values.streaming_services || '[]')
     } catch {
       return []
     }
@@ -203,9 +203,9 @@ export function SettingsForm({
             )}
           </div>
           <div className="px-5 py-5 flex flex-col gap-4">
-            {section.rows.map((row, rowIdx) => (
+            {section.rows.map((row) => (
               <div
-                key={rowIdx}
+                key={row.fields.map((f) => f.key).join('-')}
                 className={row.fields.length === 2 ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1'}
               >
                 {row.fields.map((field) => (
@@ -289,7 +289,7 @@ export function SettingsForm({
             </label>
             <select
               id="streaming_region"
-              value={values['streaming_region'] ?? 'US'}
+              value={values.streaming_region ?? 'US'}
               onChange={(e) => set('streaming_region', e.target.value)}
               className="w-64 rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
@@ -353,7 +353,7 @@ export function SettingsForm({
                           : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
                       }`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {/* biome-ignore lint/performance/noImgElement: small fixed-size icon with onError fallback */}
                       <img
                         src={`/streaming-logos/${p.providerId}.png`}
                         alt=""

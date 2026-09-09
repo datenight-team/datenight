@@ -122,6 +122,7 @@ export default function WatchlistPage() {
         <div className="space-y-2">
           {[...Array(3)].map((_, i) => (
             <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder list, never reordered
               key={i}
               className="flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3 animate-pulse"
             >

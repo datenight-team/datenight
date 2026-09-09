@@ -1,6 +1,6 @@
 // src/lib/streaming.ts
-import { writeFile, access, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { writeFile, access, mkdir } from 'node:fs/promises'
+import { join } from 'node:path'
 import { prisma } from './db'
 import { getConfig } from './config'
 import { fetchWatchProviders } from './tmdb'

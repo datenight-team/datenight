@@ -7,7 +7,7 @@ const { mkdir, access, writeFile } = vi.hoisted(() => ({
   writeFile: vi.fn(),
 }))
 
-vi.mock('fs/promises', () => ({
+vi.mock('node:fs/promises', () => ({
   mkdir,
   access,
   writeFile,
